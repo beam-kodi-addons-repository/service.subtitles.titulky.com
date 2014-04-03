@@ -14,8 +14,8 @@ class TitulkyClient(object):
 		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 ( .NET CLR 3.5.30729)')]
 		urllib2.install_opener(opener)
 
-	def download(self,link,dest_dir):
-		log(__name__,["Downoad", link, dest_dir])
+	def download(self,link,sub_id,dest_dir):
+		log(__name__,["Downoad", link, sub_id, dest_dir])
 
 	def search(self,item):
 		if not ((item['tvshow'] == None) or (item['tvshow'] == '')):

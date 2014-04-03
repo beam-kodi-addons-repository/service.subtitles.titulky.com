@@ -51,12 +51,12 @@ def Search(item):
   
   ## below arguments are optional, it can be used to pass any info needed in download function
   ## anything after "action=download&" will be sent to addon once user clicks listed subtitle to downlaod
-    url = "plugin://%s/?action=download&link=%s" % (__scriptid__, urllib.quote(subtitle['link']))
+    url = "plugin://%s/?action=download&link=%s&id=%s" % (__scriptid__, urllib.quote(subtitle['link']), subtitle['id'])
   ## add it to list, this can be done as many times as needed for all subtitles found
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False) 
 
 
-def Download(link):
+def Download(link, sub_id):
   subtitle_list = []
   ## Cleanup temp dir, we recomend you download/unzip your subs in temp folder and
   ## pass that to XBMC to copy and activate
@@ -65,7 +65,7 @@ def Download(link):
   xbmcvfs.mkdirs(__temp__)
 
   cli = TitulkyClient.TitulkyClient()
-  downloaded_file = cli.download(link,__temp__)
+  downloaded_file = cli.download(link,sub_id,__temp__)
   
   # log(__scriptname__,"Extracting subtitles")
   # subtitle_list = extract_subtitles(downloaded_file)
@@ -139,7 +139,7 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
 
 elif params['action'] == 'download':
   ## we pickup all our arguments sent from def Search()
-  subs = Download(urllib.unquote(params["link"]))
+  subs = Download(urllib.unquote(params["link"]),params["id"])
   ## we can return more than one subtitle for multi CD versions, for now we are still working out how to handle that in XBMC core
   for sub in subs:
     listitem = xbmcgui.ListItem(label=sub)
