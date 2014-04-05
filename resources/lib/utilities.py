@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 import os
-import xbmc, xbmcvfs
+import xbmc, xbmcvfs, xbmcgui
 import struct
 
 def log(module, msg):
@@ -102,4 +102,22 @@ def addfilehash(name,hash,seek):
         hash =hash & 0xffffffffffffffff
     f.close()
     return hash
+
+class CaptchaInputWindow(xbmcgui.WindowDialog):
+   def __init__(self, *args, **kwargs):
+      self.cptloc = kwargs.get('captcha')
+      log(__name__, self.cptloc)
+      self.img = xbmcgui.ControlImage(390,580,500,90,self.cptloc)
+      self.addControl(self.img)
+      self.kbd = xbmc.Keyboard('',"Enter code from image",False)
+
+   def get(self):
+      self.show()
+      self.kbd.doModal()
+      if (self.kbd.isConfirmed()):
+         text = self.kbd.getText()
+         self.close()
+         return text
+      self.close()
+      return False
 

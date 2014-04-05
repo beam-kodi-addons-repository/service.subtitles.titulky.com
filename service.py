@@ -71,6 +71,7 @@ def Download(sub_id):
     return []
 
   downloaded_file = cli.download(sub_id)
+  if downloaded_file == None: return []
 
   log(__scriptname__,"Extracting subtitles")
   subtitle_list = extract_subtitles(downloaded_file)

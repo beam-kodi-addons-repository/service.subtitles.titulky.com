@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- 
 
-from utilities import log, file_size_and_hash
+from utilities import log, file_size_and_hash, CaptchaInputWindow
 import urllib, re, os, xbmc, xbmcgui
 import urllib2, cookielib
 import HTMLParser
@@ -22,7 +22,35 @@ class TitulkyClient(object):
 		dest = os.path.join(dest_dir, "download.zip")
 
 		content = self.get_subtitle_download_page_content(sub_id)
-		# TODO: CAPTCHA HANDLE
+		control_img = self.get_control_image(content)
+		if not control_img == None:
+			log(__name__,'Found control image :(, asking user for input')
+			log(__name__,'Download control image')
+			captcha_contect = self.get_file(control_img)
+			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img")
+			img_file = open(captcha_file,'wb')
+			img_file.write(captcha_contect)
+			img_file.close()
+
+			solver = CaptchaInputWindow(captcha = captcha_file)
+			solution = solver.get()
+			if solution:
+				log(__name__,'Solution provided: %s' % solution)
+				content = self.get_subtitle_download_page_content(sub_id, solution)
+				control_img = self.get_control_image(content)
+				if not control_img == None:
+					log(__name__,'Invalid control text')
+					xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
+						self.addon.getAddonInfo('name'),
+						"Invalid control text",
+						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
+					))
+					return None
+				log(__name__,'Control image OK')
+			else:
+				log(__name__,'Dialog was canceled')
+				log(__name__,'Control text not confirmed, returning in error')
+				return None
 
 		wait_time = self.get_wait_time(content)
 
@@ -32,17 +60,15 @@ class TitulkyClient(object):
 			xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
 				self.addon.getAddonInfo('name'),
 				'Download will start in %i seconds' % (wait_time - i),
-				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')))
+				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
+			))
 			time.sleep(1)
 
 		log(__name__,'Downloading subtitle zip from %s' % link)
 
 		# DOWNLOAD FILE
-		req = urllib2.Request(link)
-		req = self.add_cookies_into_header(req)
-		response = urllib2.urlopen(req)
+		subtitles_data = self.get_file(link)
 
-		subtitles_data = response.read()
 		log(__name__,'Saving to file %s' % dest)
 		zip_file = open(dest,'wb')
 		zip_file.write(subtitles_data)
@@ -50,21 +76,19 @@ class TitulkyClient(object):
 
 		return dest
 
-	# def get_file(self,link):
-	# 	url = self.server_url+link
-	# 	log(__name__,'Downloading file %s' % (url))
-	# 	req = urllib2.Request(url)
-	# 	req = self.add_cookies_into_header(req)
-	# 	response = urllib2.urlopen(req)
-	# 	if response.headers.get('Set-Cookie'):
-	# 		phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
-	# 		if phpsessid:
-	# 			log(__name__, "Storing PHPSessionID")
-	# 			self.cookies['PHPSESSID'] = phpsessid.group(1)
-	# 	content = response.read()
-	# 	log(__name__,'Done')
-	# 	response.close()
-	# 	return content
+	def get_file(self,link):
+		req = urllib2.Request(link)
+		req = self.add_cookies_into_header(req)
+		response = urllib2.urlopen(req)
+
+		if response.headers.get('Set-Cookie'):
+			phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
+			if phpsessid:
+				log(__name__, "Storing PHPSessionID")
+				self.cookies['PHPSESSID'] = phpsessid.group(1)
+
+		data = response.read()
+		return data
 
 	def get_wait_time(self,content):
 		for matches in re.finditer('CountDown\((\d+)\)', content, re.IGNORECASE | re.DOTALL):
@@ -76,9 +100,8 @@ class TitulkyClient(object):
 
 	def get_control_image(self,content):
 		for matches in re.finditer('\.\/(captcha\/captcha\.php)', content, re.IGNORECASE | re.DOTALL):
-			return '/'+str(matches.group(1))
+			return self.server_url + '/' + str(matches.group(1))
 		return None
-
 
 	def get_subtitle_download_page_content(self, subs_id, code = None):
 		if code == None:
@@ -105,35 +128,10 @@ class TitulkyClient(object):
 		req = self.add_cookies_into_header(req)
 		response = urllib2.urlopen(req)
 		content = response.read()
-		log(__name__,'Done')
+		log(__name__,'Opening done')
 		response.close()
 		return content
 	
-	# def get_subtitle_page2(self,content,code,id):
-	# 	url = self.server_url+'/idown.php'
-	# 	post_data = {'downkod':code,'titulky':id,'zip':'z','securedown':'2','histstamp':''}
-	# 	req = urllib2.Request(url,urllib.urlencode(post_data))
-	# 	req = self.add_cookies_into_header(req)
-	# 	log(__name__,'Opening %s POST:%s' % (url,str(post_data)))
-	# 	response = urllib2.urlopen(req)
-	# 	content = response.read()
-	# 	log(__name__,'Done')
-	# 	response.close()
-	# 	return content
-		
-	# def get_subtitle_page(self,id):
-	# 	timestamp = str(calendar.timegm(time.gmtime()))
-	# 	url = self.server_url+'/idown.php?'+urllib.urlencode({'R':timestamp,'titulky':id,'histstamp':'','zip':'z'})
-	# 	log(__name__,'Opening %s' % (url))
-	# 	req = urllib2.Request(url)
-	# 	req = self.add_cookies_into_header(req)
-	# 	response = urllib2.urlopen(req)
-	# 	content = response.read()
-	# 	log(__name__,'Done')
-	# 	response.close()
-	# 	return content
-
-
 	def search(self,item):
 		if not ((item['tvshow'] == None) or (item['tvshow'] == '')):
 			title = "%s S%02dE%02d" % (item['tvshow'], int(item['season']), int(item['episode'])) # Searching TV Show
@@ -242,6 +240,7 @@ class TitulkyClient(object):
 		if 'PHPSESSID' in self.cookies:
 			cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
 		request.add_header('Cookie',cookies_string)
+		log(__name__, "Add Cookies: %s" % cookies_string)
 		return request
 
 
