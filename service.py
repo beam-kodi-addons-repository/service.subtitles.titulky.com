@@ -34,7 +34,7 @@ def Search(item):
   #### use item["some_property"] that was set earlier
   #### once done, set xbmcgui.ListItem() below and pass it to xbmcplugin.addDirectoryItem()
   
-  cli = TitulkyClient.TitulkyClient()
+  cli = TitulkyClient.TitulkyClient(__addon__)
   found_subtitles = cli.search(item)
 
   if (found_subtitles == [] or found_subtitles == None):
@@ -51,12 +51,12 @@ def Search(item):
   
   ## below arguments are optional, it can be used to pass any info needed in download function
   ## anything after "action=download&" will be sent to addon once user clicks listed subtitle to downlaod
-    url = "plugin://%s/?action=download&link=%s&id=%s" % (__scriptid__, urllib.quote(subtitle['link']), subtitle['id'])
+    url = "plugin://%s/?action=download&id=%s" % (__scriptid__, subtitle['id'])
   ## add it to list, this can be done as many times as needed for all subtitles found
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False) 
 
 
-def Download(link, sub_id):
+def Download(sub_id):
   subtitle_list = []
   ## Cleanup temp dir, we recomend you download/unzip your subs in temp folder and
   ## pass that to XBMC to copy and activate
@@ -64,12 +64,17 @@ def Download(link, sub_id):
     shutil.rmtree(__temp__)
   xbmcvfs.mkdirs(__temp__)
 
-  cli = TitulkyClient.TitulkyClient()
-  downloaded_file = cli.download(link,sub_id,__temp__)
-  
-  # log(__scriptname__,"Extracting subtitles")
-  # subtitle_list = extract_subtitles(downloaded_file)
-  # log(__scriptname__,subtitle_list)
+  cli = TitulkyClient.TitulkyClient(__addon__)
+  if not cli.login(__addon__.getSetting("username"), __addon__.getSetting("password")):
+    dialog = xbmcgui.Dialog()
+    dialog.ok(__scriptname__,'Login to Titulky.com failed. Check your username/password at the addon configuration')
+    return []
+
+  downloaded_file = cli.download(sub_id)
+
+  log(__scriptname__,"Extracting subtitles")
+  subtitle_list = extract_subtitles(downloaded_file)
+  log(__scriptname__,subtitle_list)
   # subtitle_list.append("/Path/Of/Subtitle2.srt") # this can be url, local path or network path.
   
   return subtitle_list
@@ -139,7 +144,7 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
 
 elif params['action'] == 'download':
   ## we pickup all our arguments sent from def Search()
-  subs = Download(urllib.unquote(params["link"]),params["id"])
+  subs = Download(params["id"])
   ## we can return more than one subtitle for multi CD versions, for now we are still working out how to handle that in XBMC core
   for sub in subs:
     listitem = xbmcgui.ListItem(label=sub)

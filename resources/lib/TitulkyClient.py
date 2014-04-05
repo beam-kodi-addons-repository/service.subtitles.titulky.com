@@ -8,14 +8,131 @@ import time,calendar
 
 class TitulkyClient(object):
 
-	def __init__(self):
+	def __init__(self,addon):
 		self.server_url = 'http://www.titulky.com'
+		self.addon = addon
+
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
 		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 ( .NET CLR 3.5.30729)')]
 		urllib2.install_opener(opener)
 
-	def download(self,link,sub_id,dest_dir):
-		log(__name__,["Downoad", link, sub_id, dest_dir])
+	def download(self,sub_id):
+
+		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile').decode("utf-8")), 'temp')
+		dest = os.path.join(dest_dir, "download.zip")
+
+		content = self.get_subtitle_download_page_content(sub_id)
+		# TODO: CAPTCHA HANDLE
+
+		wait_time = self.get_wait_time(content)
+
+		link = self.get_final_download_link(content)
+		log(__name__,'Got the link, wait %i seconds before download' % (wait_time))
+		for i in range(wait_time + 1):
+			xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
+				self.addon.getAddonInfo('name'),
+				'Download will start in %i seconds' % (wait_time - i),
+				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')))
+			time.sleep(1)
+
+		log(__name__,'Downloading subtitle zip from %s' % link)
+
+		# DOWNLOAD FILE
+		req = urllib2.Request(link)
+		req = self.add_cookies_into_header(req)
+		response = urllib2.urlopen(req)
+
+		subtitles_data = response.read()
+		log(__name__,'Saving to file %s' % dest)
+		zip_file = open(dest,'wb')
+		zip_file.write(subtitles_data)
+		zip_file.close()
+
+		return dest
+
+	# def get_file(self,link):
+	# 	url = self.server_url+link
+	# 	log(__name__,'Downloading file %s' % (url))
+	# 	req = urllib2.Request(url)
+	# 	req = self.add_cookies_into_header(req)
+	# 	response = urllib2.urlopen(req)
+	# 	if response.headers.get('Set-Cookie'):
+	# 		phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
+	# 		if phpsessid:
+	# 			log(__name__, "Storing PHPSessionID")
+	# 			self.cookies['PHPSESSID'] = phpsessid.group(1)
+	# 	content = response.read()
+	# 	log(__name__,'Done')
+	# 	response.close()
+	# 	return content
+
+	def get_wait_time(self,content):
+		for matches in re.finditer('CountDown\((\d+)\)', content, re.IGNORECASE | re.DOTALL):
+			return int(matches.group(1))
+
+	def get_final_download_link(self,content):
+		for matches in re.finditer('<a.+id=\"downlink\" href="([^\"]+)\"', content, re.IGNORECASE | re.DOTALL):
+			return self.server_url + str(matches.group(1))
+
+	def get_control_image(self,content):
+		for matches in re.finditer('\.\/(captcha\/captcha\.php)', content, re.IGNORECASE | re.DOTALL):
+			return '/'+str(matches.group(1))
+		return None
+
+
+	def get_subtitle_download_page_content(self, subs_id, code = None):
+		if code == None:
+			url = self.server_url + '/idown.php?' + urllib.urlencode({
+					'R':str(calendar.timegm(time.gmtime())),
+					'titulky':subs_id,
+					'histstamp':'',
+					'zip':'z'})
+			log(__name__,'Opening %s' % (url))
+			req = urllib2.Request(url)
+
+		else:
+			url = self.server_url+'/idown.php'
+			post_data = {
+				'downkod':code,
+				'titulky':subs_id,
+				'zip':'z',
+				'securedown':'2',
+				'histstamp':''
+			}
+			log(__name__,'Opening %s POST:%s' % (url,str(post_data)))
+			req = urllib2.Request(url,urllib.urlencode(post_data))
+
+		req = self.add_cookies_into_header(req)
+		response = urllib2.urlopen(req)
+		content = response.read()
+		log(__name__,'Done')
+		response.close()
+		return content
+	
+	# def get_subtitle_page2(self,content,code,id):
+	# 	url = self.server_url+'/idown.php'
+	# 	post_data = {'downkod':code,'titulky':id,'zip':'z','securedown':'2','histstamp':''}
+	# 	req = urllib2.Request(url,urllib.urlencode(post_data))
+	# 	req = self.add_cookies_into_header(req)
+	# 	log(__name__,'Opening %s POST:%s' % (url,str(post_data)))
+	# 	response = urllib2.urlopen(req)
+	# 	content = response.read()
+	# 	log(__name__,'Done')
+	# 	response.close()
+	# 	return content
+		
+	# def get_subtitle_page(self,id):
+	# 	timestamp = str(calendar.timegm(time.gmtime()))
+	# 	url = self.server_url+'/idown.php?'+urllib.urlencode({'R':timestamp,'titulky':id,'histstamp':'','zip':'z'})
+	# 	log(__name__,'Opening %s' % (url))
+	# 	req = urllib2.Request(url)
+	# 	req = self.add_cookies_into_header(req)
+	# 	response = urllib2.urlopen(req)
+	# 	content = response.read()
+	# 	log(__name__,'Done')
+	# 	response.close()
+	# 	return content
+
 
 	def search(self,item):
 		if not ((item['tvshow'] == None) or (item['tvshow'] == '')):
@@ -45,7 +162,6 @@ class TitulkyClient(object):
 			result_subtitles.append({ 
 				'filename': HTMLParser.HTMLParser().unescape(print_out_filename + " by " + found_subtitle['author']),
 				'id': found_subtitle['id'],
-				'link': self.server_url + '/idown.php?' + urllib.urlencode({'R':str(calendar.timegm(time.gmtime())),'titulky':found_subtitle['id'],'histstamp':'','zip':'z'}),
 				'lang': found_subtitle['lang'],
 	 			'rating': str(found_subtitle['down_count']*5/max_down_count),
 				'sync': (found_subtitle['size'] == file_size),
@@ -101,3 +217,31 @@ class TitulkyClient(object):
 			subtitles.append(subtitle)
 
 		return subtitles
+
+	def login(self,username,password):
+		log(__name__,'Logging in to Titulky.com')
+		if (username == '' or username == None): return False
+		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '1','Detail2':''} )
+		request = urllib2.Request(self.server_url + '/index.php',login_postdata)
+		response = urllib2.urlopen(request)
+		log(__name__,'Got response')
+		if response.read().find('BadLogin')>-1: return False
+
+		log(__name__,'Storing Cookies')
+		self.cookies = {}
+		self.cookies['CRC'] = re.search('CRC=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
+		self.cookies['LogonLogin'] = re.search('LogonLogin=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
+		self.cookies['LogonId'] = re.search('LogonId=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
+
+		return True
+
+	def add_cookies_into_header(self,request):
+		cookies_string = "LogonLogin=" + self.cookies['LogonLogin'] + "; "
+		cookies_string += "LogonId=" + self.cookies['LogonId'] + "; "
+		cookies_string += "CRC=" + self.cookies['CRC']
+		if 'PHPSESSID' in self.cookies:
+			cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
+		request.add_header('Cookie',cookies_string)
+		return request
+
+
