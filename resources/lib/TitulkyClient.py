@@ -155,10 +155,10 @@ class TitulkyClient(object):
 
 		result_subtitles = []
 		for found_subtitle in found_subtitles:
-
-			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '']
+			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '' or found_subtitle['version'] == None]
+			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
 			result_subtitles.append({ 
-				'filename': HTMLParser.HTMLParser().unescape(print_out_filename + " by " + found_subtitle['author']),
+				'filename': HTMLParser.HTMLParser().unescape(print_out_filename),
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
 	 			'rating': str(found_subtitle['down_count']*5/max_down_count),
@@ -201,7 +201,9 @@ class TitulkyClient(object):
 			except:
 				subtitle['version'] = None
 			subtitle['season_and_episode'] = re.search('((.+?)</td>){2}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
+			if subtitle['season_and_episode'] == "&nbsp;": subtitle['season_and_episode'] = None
 			subtitle['year'] = re.search('((.+?)</td>){3}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
+			if subtitle['year'] == "&nbsp;": subtitle['year'] = None
 			subtitle['down_count'] = int(re.search('((.+?)</td>){4}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data'))
 			subtitle['lang'] = re.search('((.+?)</td>){5}[^>]+><img alt=\"(?P<data>\w{2})\"',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
 			if subtitle['lang'] == "CZ": subtitle['lang'] = "Czech"
@@ -211,7 +213,10 @@ class TitulkyClient(object):
 				subtitle['size'] = float(re.search('((.+?)</td>){7}[^>]+>(?P<data>[\d\.]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data'))
 			except:
 				subtitle['size'] = None
-			subtitle['author'] = re.search('((.+?)</td>){8}[^>]+>[^>]+<a href[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL | re.MULTILINE ).group('data').strip()
+			try:
+				subtitle['author'] = re.search('((.+?)</td>){8}[^>]+>[^>]+<a href[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL | re.MULTILINE ).group('data').strip()
+			except:
+				subtitle['author'] = None
 			subtitles.append(subtitle)
 
 		return subtitles

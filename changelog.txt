@@ -1,2 +1,5 @@
+v0.0.2 (6.4.2014)
+- oprava vyhledavani pokud jsou titulky oznacene jako anonymni
+
 v0.0.1 (3.4.2014)
 - preklopeni puvodni verze na Gotham
