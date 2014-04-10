@@ -1,5 +1,6 @@
 v0.0.3 (10.4.2014)
 	- manualni vyhledavani
+	- fix vyhledavani pokud titulky nebyly z webu nikdy stazeny
 
 v0.0.2 (6.4.2014)
 	- oprava vyhledavani pokud jsou titulky oznacene jako anonymni

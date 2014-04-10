@@ -163,7 +163,7 @@ class TitulkyClient(object):
 				'filename': HTMLParser.HTMLParser().unescape(print_out_filename),
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
-	 			'rating': str(found_subtitle['down_count']*5/max_down_count),
+				'rating': str(found_subtitle['down_count']*5/max_down_count) if max_down_count > 0 else "0",
 				'sync': (found_subtitle['size'] == file_size),
 				'lang_flag': xbmc.convertLanguage(found_subtitle['lang'],xbmc.ISO_639_1),
 			})
