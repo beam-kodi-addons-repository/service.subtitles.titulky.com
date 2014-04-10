@@ -112,6 +112,7 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
   item = {}
   item['temp']               = False
   item['rar']                = False
+  item['mansearch']          = False
   item['year']               = xbmc.getInfoLabel("VideoPlayer.Year")                           # Year
   item['season']             = str(xbmc.getInfoLabel("VideoPlayer.Season"))                    # Season
   item['episode']            = str(xbmc.getInfoLabel("VideoPlayer.Episode"))                   # Episode
@@ -119,6 +120,10 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
   item['title']              = normalizeString(xbmc.getInfoLabel("VideoPlayer.OriginalTitle")) # try to get original title
   item['file_original_path'] = urllib.unquote(xbmc.Player().getPlayingFile().decode('utf-8'))  # Full path of a playing file
   item['3let_language']      = []
+
+  if 'searchstring' in params:
+    item['mansearch'] = True
+    item['mansearchstr'] = urllib.unquote(params['searchstring']).decode('utf-8')
   
   for lang in urllib.unquote(params['languages']).decode('utf-8').split(","):
     item['3let_language'].append(xbmc.convertLanguage(lang,xbmc.ISO_639_2))
