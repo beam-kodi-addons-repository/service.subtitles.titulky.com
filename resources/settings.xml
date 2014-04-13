@@ -4,4 +4,7 @@
       <setting id="username" type="text" label="Username" default=""/>
       <setting id="password" type="text" option = "hidden" label="Password" default=""/>
     </category>
+    <category label="Search">
+      <setting id="search_title_in_brackets" type="bool" label="Use text in brackets as search pattern" default="false"/>
+    </category>
 </settings>

@@ -139,6 +139,10 @@ class TitulkyClient(object):
 			title = "%s S%02dE%02d" % (item['tvshow'], int(item['season']), int(item['episode'])) # Searching TV Show
 		else:
 			title = item['title'] # Searching movie
+			if self.addon.getSetting("search_title_in_brackets") == "true":
+				log(__name__, "Searching title in brackets - %s" % title)
+				search_second_title = re.match(r'.+ \((.+)\)',title)
+				if search_second_title: title = search_second_title.group(1)
 
 		log(__name__, "Search pattern: " + title)
 
