@@ -1,5 +1,5 @@
 v0.0.4 (13.4.2014)
-	- moznost pouzit text v zavorkach jako text pro vyhledavani
+	- moznost pouzit text v zavorkach jako text pro vyhledavani (vypnuto)
 
 v0.0.3 (10.4.2014)
 	- manualni vyhledavani
