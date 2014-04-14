@@ -1,5 +1,6 @@
 v0.0.5 (14.4.2014)
 	- normalizace textu vytazeneho ze zavorek
+	- oprava pri vyhledavani pokud titulky nemaji urceny jazyk (skip)
 
 v0.0.4 (13.4.2014)
 	- moznost pouzit text v zavorkach jako text pro vyhledavani (vypnuto)

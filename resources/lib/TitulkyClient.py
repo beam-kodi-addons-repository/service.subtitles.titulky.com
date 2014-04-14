@@ -212,7 +212,10 @@ class TitulkyClient(object):
 			subtitle['year'] = re.search('((.+?)</td>){3}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
 			if subtitle['year'] == "&nbsp;": subtitle['year'] = None
 			subtitle['down_count'] = int(re.search('((.+?)</td>){4}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data'))
-			subtitle['lang'] = re.search('((.+?)</td>){5}[^>]+><img alt=\"(?P<data>\w{2})\"',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
+			try:
+				subtitle['lang'] = re.search('((.+?)</td>){5}[^>]+><img alt=\"(?P<data>\w{2})\"',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
+			except:
+				continue
 			if subtitle['lang'] == "CZ": subtitle['lang'] = "Czech"
 			if subtitle['lang'] == "SK": subtitle['lang'] = "Slovak"
 			subtitle['num_of_dics'] = re.search('((.+?)</td>){6}[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
