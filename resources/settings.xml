@@ -5,6 +5,6 @@
       <setting id="password" type="text" option = "hidden" label="Password" default=""/>
     </category>
     <category label="Search">
-      <setting id="search_title_in_brackets" type="bool" label="Use text in brackets as search pattern" default="false"/>
+      <setting id="search_title_in_brackets" type="bool" label="Use text in brackets as search pattern and normalize" default="false"/>
     </category>
 </settings>

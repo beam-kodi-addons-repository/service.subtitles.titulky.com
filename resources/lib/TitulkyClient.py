@@ -143,6 +143,7 @@ class TitulkyClient(object):
 				log(__name__, "Searching title in brackets - %s" % title)
 				search_second_title = re.match(r'.+ \((.+)\)',title)
 				if search_second_title: title = search_second_title.group(1)
+				if re.search(r', The$',title,re.IGNORECASE): title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
 
 		log(__name__, "Search pattern: " + title)
 
