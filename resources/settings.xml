@@ -7,4 +7,7 @@
     <category label="Search">
       <setting id="search_title_in_brackets" type="bool" label="Use text in brackets as search pattern and normalize" default="false"/>
     </category>
+    <category label="Save">
+      <setting id="copy_subs_if_rar_played" type="bool" label="Copy subtitles next to the video if video is played from rar" default="false" />
+    </category>
 </settings>

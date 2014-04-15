@@ -1,3 +1,6 @@
+v0.0.7 (15.4.2014)
+- moznost zkopirovani titulku vedle videa, pokud je prehravano video z raru (vypnuto)
+
 v0.0.6 (15.4.2014)
 - uprava velikosti ikony
 
