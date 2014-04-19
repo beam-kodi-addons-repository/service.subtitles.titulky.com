@@ -1,2 +1,2 @@
-**/*.pyo
+**/*.py[oc]
 **/.DS_Store

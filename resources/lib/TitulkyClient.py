@@ -169,7 +169,7 @@ class TitulkyClient(object):
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
 				'rating': str(found_subtitle['down_count']*5/max_down_count) if max_down_count > 0 else "0",
-				'sync': (found_subtitle['size'] == file_size),
+				'sync': (found_subtitle['size'] == file_size and file_size > 0),
 				'lang_flag': xbmc.convertLanguage(found_subtitle['lang'],xbmc.ISO_639_1),
 			})
 
