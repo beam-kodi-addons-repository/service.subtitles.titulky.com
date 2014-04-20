@@ -2,7 +2,7 @@
 
 import os
 import xbmc, xbmcvfs, xbmcgui
-import struct
+from struct import Struct
 import urllib
 
 def log(module, msg):
@@ -34,12 +34,65 @@ def copy_subtitles_on_rar(subtitle_list,lang):
     else:
         return False
 
-def file_size_and_hash(filename, rar):
+def get_file_size(filename, is_rar):
     try:
-      file_size, file_hash = hashFile(filename, rar)
+        if is_rar:
+            file_size = get_file_size_from_rar(filename)
+            return -1 if file_size == None else file_size
+        else:
+            return xbmcvfs.Stat(filename).st_size()
     except:
-      file_size, file_hash = -1, None
-    return file_size, file_hash
+        return -1
+
+# Based on https://github.com/markokr/rarfile/blob/master/rarfile.py
+def get_file_size_from_rar(first_rar_filename):
+
+    log_name = __name__ + " [RAR]"
+
+    RAR_BLOCK_MAIN          = 0x73 # s
+    RAR_BLOCK_FILE          = 0x74 # t
+    RAR_FILE_LARGE          = 0x0100
+    RAR_ID = str("Rar!\x1a\x07\x00")
+
+    S_BLK_HDR = Struct('<HBHH')
+    S_FILE_HDR = Struct('<LLBLLBBHL')
+    S_LONG = Struct('<L')
+
+    fd = xbmcvfs.File(first_rar_filename)
+    if fd.read(len(RAR_ID)) == RAR_ID:
+        log(log_name, "Reading file headers")
+        while True:
+
+            buf = fd.read(S_BLK_HDR.size)
+            if not buf: return None
+
+            t = S_BLK_HDR.unpack_from(buf)
+            header_crc, header_type, header_flags, header_size = t
+            pos = S_BLK_HDR.size
+
+            # read full header
+            header_data = buf + fd.read(header_size - S_BLK_HDR.size) if header_size > S_BLK_HDR.size else buf
+
+            if len(header_data) != header_size: return None # unexpected EOF?
+
+            if header_type == RAR_BLOCK_MAIN:
+                log(log_name, "Main block found")
+                continue
+            elif header_type == RAR_BLOCK_FILE:
+                log(log_name, "File block found")
+                file_size = S_FILE_HDR.unpack_from(header_data, pos)[1]
+                log(log_name, "File in rar size: %s" % file_size)
+                if header_flags & RAR_FILE_LARGE: # Large file support
+                    log(log_name, "Large file flag")
+                    file_size |= S_LONG.unpack_from(header_data, pos + S_FILE_HDR.size + 4)[0] << 32
+                    log(log_name, "File in rar size: %s after large file" % file_size)
+                return file_size
+            else:
+                log(__name__, "RAR unknown header type %s" % header_type)
+                return None
+    else:
+        return None
+
 
 def extract_subtitles(archive_dir):
     xbmc.executebuiltin(('XBMC.Extract("%s")' % archive_dir).encode('utf-8'))
@@ -55,80 +108,6 @@ def extract_subtitles(archive_dir):
         if os.path.splitext(extracted_file)[1] in exts:
           extracted_subtitles.append(os.path.join(basepath, extracted_file))
     return extracted_subtitles
-
-def hashFile(file_path, rar):
-    if rar:
-      return hashRar(file_path)
-
-    log( __name__,"Hash Standard file")
-    longlongformat = 'q'  # long long
-    bytesize = struct.calcsize(longlongformat)
-    f = xbmcvfs.File(file_path)
-
-    filesize = f.size()
-    hash = filesize
-
-    if filesize < 65536 * 2:
-        return "SizeError"
-
-    buffer = f.read(65536)
-    f.seek(max(0,filesize-65536),0)
-    buffer += f.read(65536)
-    f.close()
-    for x in range((65536/bytesize)*2):
-        size = x*bytesize
-        (l_value,)= struct.unpack(longlongformat, buffer[size:size+bytesize])
-        hash += l_value
-        hash = hash & 0xFFFFFFFFFFFFFFFF
-
-    returnHash = "%016x" % hash
-    return filesize,returnHash
-
-
-def hashRar(firsrarfile):
-    log( __name__,"Hash Rar file")
-    f = xbmcvfs.File(firsrarfile)
-    a=f.read(4)
-    if a!='Rar!':
-        raise Exception('ERROR: This is not rar file.')
-    seek=0
-    for i in range(4):
-        f.seek(max(0,seek),0)
-        a=f.read(100)
-        type,flag,size=struct.unpack( '<BHH', a[2:2+5])
-        if 0x74==type:
-            if 0x30!=struct.unpack( '<B', a[25:25+1])[0]:
-                raise Exception('Bad compression method! Work only for "store".')
-            s_partiizebodystart=seek+size
-            s_partiizebody,s_unpacksize=struct.unpack( '<II', a[7:7+2*4])
-            if (flag & 0x0100):
-                s_unpacksize=(unpack( '<I', a[36:36+4])[0] <<32 )+s_unpacksize
-                log( __name__ , 'Hash untested for files biger that 2gb. May work or may generate bad hash.')
-            lastrarfile=getlastsplit(firsrarfile,(s_unpacksize-1)/s_partiizebody)
-            hash=addfilehash(firsrarfile,s_unpacksize,s_partiizebodystart)
-            hash=addfilehash(lastrarfile,hash,(s_unpacksize%s_partiizebody)+s_partiizebodystart-65536)
-            f.close()
-            return (s_unpacksize,"%016x" % hash )
-        seek+=size
-    raise Exception('ERROR: Not Body part in rar file.')
-
-def getlastsplit(firsrarfile,x):
-    if firsrarfile[-3:]=='001':
-        return firsrarfile[:-3]+('%03d' %(x+1))
-    if firsrarfile[-11:-6]=='.part':
-        return firsrarfile[0:-6]+('%02d' % (x+1))+firsrarfile[-4:]
-    if firsrarfile[-10:-5]=='.part':
-        return firsrarfile[0:-5]+('%1d' % (x+1))+firsrarfile[-4:]
-    return firsrarfile[0:-2]+('%02d' %(x-1) )
-
-def addfilehash(name,hash,seek):
-    f = xbmcvfs.File(name)
-    f.seek(max(0,seek),0)
-    for i in range(8192):
-        hash+=struct.unpack('<q', f.read(8))[0]
-        hash =hash & 0xffffffffffffffff
-    f.close()
-    return hash
 
 class CaptchaInputWindow(xbmcgui.WindowDialog):
    def __init__(self, *args, **kwargs):

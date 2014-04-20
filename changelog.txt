@@ -1,5 +1,7 @@
-v0.0.8 (19.4.2014)
+v0.0.8 (?.?.?)
 - oprava oznaceni titulku jako synced pokud se nepodarilo zjistit velikost lokalniho souboru
+- nova metoda pro zjisteni velikosti souboru v raru
+- drobne procisteni kodu
 
 v0.0.7 (15.4.2014)
 - moznost zkopirovani titulku vedle videa, pokud je prehravano video z raru (vypnuto)

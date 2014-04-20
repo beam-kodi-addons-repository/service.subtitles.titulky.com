@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- 
 
-from utilities import log, file_size_and_hash, CaptchaInputWindow
+from utilities import log, get_file_size, CaptchaInputWindow
 import urllib, re, os, xbmc, xbmcgui
 import urllib2, cookielib
 import HTMLParser
@@ -154,7 +154,7 @@ class TitulkyClient(object):
 			log(__name__, "Subtitles not found")
 			return None
 			
-		file_size, file_hash = file_size_and_hash(item['file_original_path'], item['rar'])
+		file_size = get_file_size(item['file_original_path'], item['rar'])
 		if not (file_size == -1): file_size = round(float(file_size)/(1024*1024),2)
 		log(__name__, "File size: " + str(file_size))
 
