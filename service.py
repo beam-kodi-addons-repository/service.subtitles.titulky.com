@@ -26,7 +26,7 @@ __temp__       = xbmc.translatePath( os.path.join( __profile__, 'temp') ).decode
 sys.path.append (__resource__)
 
 from utilities import log, extract_subtitles, copy_subtitles_on_rar
-import TitulkyClient
+from TitulkyClient import TitulkyClient as SubtitlesClient
 
 def Search(item):
 
@@ -34,7 +34,7 @@ def Search(item):
   #### use item["some_property"] that was set earlier
   #### once done, set xbmcgui.ListItem() below and pass it to xbmcplugin.addDirectoryItem()
   
-  cli = TitulkyClient.TitulkyClient(__addon__)
+  cli = SubtitlesClient(__addon__)
   found_subtitles = cli.search(item)
 
   if (found_subtitles == [] or found_subtitles == None):
@@ -64,7 +64,7 @@ def Download(sub_id, lang):
     shutil.rmtree(__temp__)
   xbmcvfs.mkdirs(__temp__)
 
-  cli = TitulkyClient.TitulkyClient(__addon__)
+  cli = SubtitlesClient(__addon__)
   if not cli.login(__addon__.getSetting("username"), __addon__.getSetting("password")):
     dialog = xbmcgui.Dialog()
     dialog.ok(__scriptname__,'Login to Titulky.com failed. Check your username/password at the addon configuration')
