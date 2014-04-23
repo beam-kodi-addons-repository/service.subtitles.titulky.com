@@ -127,8 +127,9 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
     item['mansearch'] = True
     item['mansearchstr'] = urllib.unquote(params['searchstring']).decode('utf-8')
   
-  for lang in urllib.unquote(params['languages']).decode('utf-8').split(","):
-    item['3let_language'].append(xbmc.convertLanguage(lang,xbmc.ISO_639_2))
+  if 'languages' in params:
+    for lang in urllib.unquote(params['languages']).decode('utf-8').split(","):
+      item['3let_language'].append(xbmc.convertLanguage(lang,xbmc.ISO_639_2))
   
   if item['title'] == "":
     item['title']  = normalizeString(xbmc.getInfoLabel("VideoPlayer.Title"))      # no original title, get just Title

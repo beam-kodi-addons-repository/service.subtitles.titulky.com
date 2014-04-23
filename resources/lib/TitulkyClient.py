@@ -150,7 +150,10 @@ class TitulkyClient(object):
 		found_subtitles = self.search_subtitle(title)
 		log(__name__, "Parsed subtitles: %s" % found_subtitles )
 
-		if found_subtitles.__len__() == 0:
+		lang_filetred_found_subtitles = self.filter_subtitles_by_language(item['3let_language'], found_subtitles)
+		log(__name__, ["Language filter", lang_filetred_found_subtitles])
+
+		if not lang_filetred_found_subtitles:
 			log(__name__, "Subtitles not found")
 			return None
 			
@@ -158,10 +161,10 @@ class TitulkyClient(object):
 		if not (file_size == -1): file_size = round(float(file_size)/(1024*1024),2)
 		log(__name__, "File size: " + str(file_size))
 
-		max_down_count = self.detect_max_download_stats(found_subtitles)
+		max_down_count = self.detect_max_download_stats(lang_filetred_found_subtitles)
 
 		result_subtitles = []
-		for found_subtitle in found_subtitles:
+		for found_subtitle in lang_filetred_found_subtitles:
 			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '' or found_subtitle['version'] == None]
 			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
 			result_subtitles.append({ 
@@ -173,9 +176,23 @@ class TitulkyClient(object):
 				'lang_flag': xbmc.convertLanguage(found_subtitle['lang'],xbmc.ISO_639_1),
 			})
 
-		log(__name__,"Search RESULT")
-		log(__name__,result_subtitles)
+		log(__name__,["Search RESULT", result_subtitles])
 		return result_subtitles
+
+	def filter_subtitles_by_language(self, set_languages, subtitles_list):
+		if not set_languages: return subtitles_list
+
+		log(__name__, ['Filter by Languages', set_languages])
+		filter_subtitles_list = []
+		for subtitle in subtitles_list:
+			if xbmc.convertLanguage(subtitle['lang'],xbmc.ISO_639_2) in set_languages:
+				filter_subtitles_list.append(subtitle)
+
+		if filter_subtitles_list:
+			return filter_subtitles_list
+		else:
+			return None
+
 
 	def detect_max_download_stats(self, subtitle_list):
 		max_down_count = 0
