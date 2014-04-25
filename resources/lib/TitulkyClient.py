@@ -11,13 +11,14 @@ class TitulkyClient(object):
 	def __init__(self,addon):
 		self.server_url = 'http://www.titulky.com'
 		self.addon = addon
+		self._t = addon.getLocalizedString
 
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
 		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 ( .NET CLR 3.5.30729)')]
 		urllib2.install_opener(opener)
 
 	def download(self,sub_id):
-
+		
 		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile').decode("utf-8")), 'temp')
 		dest = os.path.join(dest_dir, "download.zip")
 
@@ -32,7 +33,7 @@ class TitulkyClient(object):
 			img_file.write(captcha_contect)
 			img_file.close()
 
-			solver = CaptchaInputWindow(captcha = captcha_file)
+			solver = CaptchaInputWindow(captcha = captcha_file, title_text = self._t(32013))
 			solution = solver.get()
 			if solution:
 				log(__name__,'Solution provided: %s' % solution)
@@ -41,8 +42,7 @@ class TitulkyClient(object):
 				if not control_img == None:
 					log(__name__,'Invalid control text')
 					xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
-						self.addon.getAddonInfo('name'),
-						"Invalid control text",
+						self.addon.getAddonInfo('name'), self._t(32014),
 						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
 					))
 					return None
@@ -59,7 +59,7 @@ class TitulkyClient(object):
 		for i in range(wait_time + 1):
 			xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
 				self.addon.getAddonInfo('name'),
-				'Download will start in %i seconds' % (wait_time - i),
+				self._t(32015) % (wait_time - i),
 				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
 			))
 			time.sleep(1)

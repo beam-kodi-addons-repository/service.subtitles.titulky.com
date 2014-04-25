@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <category label="Account">
-      <setting id="username" type="text" label="Username" default=""/>
-      <setting id="password" type="text" option = "hidden" label="Password" default=""/>
+    <category label="32008">
+      <setting id="username" type="text" label="32009" default=""/>
+      <setting id="password" type="text" option="hidden" label="32010" default=""/>
     </category>
-    <category label="Search">
-      <setting id="search_title_in_brackets" type="bool" label="Use text in brackets as search pattern and normalize" default="false"/>
+    <category label="32005">
+      <setting id="search_title_in_brackets" type="bool" label="32011" default="false"/>
     </category>
-    <category label="Save">
-      <setting id="copy_subs_if_rar_played" type="bool" label="Copy subtitles next to the video if video is played from rar" default="false" />
+    <category label="32002">
+      <setting id="copy_subs_if_rar_played" type="bool" label="32001" default="false" />
     </category>
 </settings>

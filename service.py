@@ -67,7 +67,7 @@ def Download(sub_id, lang):
   cli = SubtitlesClient(__addon__)
   if not cli.login(__addon__.getSetting("username"), __addon__.getSetting("password")):
     dialog = xbmcgui.Dialog()
-    dialog.ok(__scriptname__,'Login to Titulky.com failed. Check your username/password at the addon configuration')
+    dialog.ok(__scriptname__,__language__(32012))
     return []
 
   downloaded_file = cli.download(sub_id)
