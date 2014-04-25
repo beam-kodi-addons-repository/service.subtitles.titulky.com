@@ -107,9 +107,6 @@ def get_params():
 
 params = get_params()
 
-print params
-
-
 if params['action'] == 'search' or params['action'] == 'manualsearch':
   item = {}
   item['temp']               = False

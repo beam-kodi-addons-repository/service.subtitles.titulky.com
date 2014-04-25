@@ -48,8 +48,7 @@ class TitulkyClient(object):
 					return None
 				log(__name__,'Control image OK')
 			else:
-				log(__name__,'Dialog was canceled')
-				log(__name__,'Control text not confirmed, returning in error')
+				log(__name__,'Dialog was canceled Control text not confirmed, returning in error')
 				return None
 
 		wait_time = self.get_wait_time(content)
@@ -83,9 +82,7 @@ class TitulkyClient(object):
 
 		if response.headers.get('Set-Cookie'):
 			phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
-			if phpsessid:
-				log(__name__, "Storing PHPSessionID")
-				self.cookies['PHPSESSID'] = phpsessid.group(1)
+			if phpsessid: self.cookies['PHPSESSID'] = phpsessid.group(1)
 
 		data = response.read()
 		return data
@@ -152,14 +149,11 @@ class TitulkyClient(object):
 
 		lang_filetred_found_subtitles = self.filter_subtitles_by_language(item['3let_language'], found_subtitles)
 		log(__name__, ["Language filter", lang_filetred_found_subtitles])
-
-		if not lang_filetred_found_subtitles:
-			log(__name__, "Subtitles not found")
-			return None
+		if not lang_filetred_found_subtitles: return None
 			
 		file_size = get_file_size(item['file_original_path'], item['rar'])
 		if not (file_size == -1): file_size = round(float(file_size)/(1024*1024),2)
-		log(__name__, "File size: " + str(file_size))
+		log(__name__, "File size: %s" % file_size)
 
 		max_down_count = self.detect_max_download_stats(lang_filetred_found_subtitles)
 
@@ -176,13 +170,13 @@ class TitulkyClient(object):
 				'lang_flag': xbmc.convertLanguage(found_subtitle['lang'],xbmc.ISO_639_1),
 			})
 
-		log(__name__,["Search RESULT", result_subtitles])
+		log(__name__,["Search result", result_subtitles])
 		return result_subtitles
 
 	def filter_subtitles_by_language(self, set_languages, subtitles_list):
 		if not set_languages: return subtitles_list
 
-		log(__name__, ['Filter by Languages', set_languages])
+		log(__name__, ['Filter by languages', set_languages])
 		filter_subtitles_list = []
 		for subtitle in subtitles_list:
 			if xbmc.convertLanguage(subtitle['lang'],xbmc.ISO_639_2) in set_languages:
@@ -250,7 +244,7 @@ class TitulkyClient(object):
 
 	def login(self,username,password):
 		log(__name__,'Logging in to Titulky.com')
-		if (username == '' or username == None): return False
+		if not username: return False
 		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '1','Detail2':''} )
 		request = urllib2.Request(self.server_url + '/index.php',login_postdata)
 		response = urllib2.urlopen(request)
@@ -269,10 +263,10 @@ class TitulkyClient(object):
 		cookies_string = "LogonLogin=" + self.cookies['LogonLogin'] + "; "
 		cookies_string += "LogonId=" + self.cookies['LogonId'] + "; "
 		cookies_string += "CRC=" + self.cookies['CRC']
-		if 'PHPSESSID' in self.cookies:
-			cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
+		if 'PHPSESSID' in self.cookies: cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
+			
 		request.add_header('Cookie',cookies_string)
-		log(__name__, "Add Cookies: %s" % cookies_string)
+		log(__name__, "Adding cookies into header")
 		return request
 
 
