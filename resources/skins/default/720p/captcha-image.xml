@@ -1,0 +1,12 @@
+<window>
+	<zorder>3</zorder>
+	<controls>
+		<control type="image" id="101">
+			<posx>340</posx>
+			<posy>10</posy>
+			<width>600</width>
+	        <height>150</height>
+			<texture></texture>
+		</control>
+	</controls>
+</window>

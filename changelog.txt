@@ -1,3 +1,6 @@
+v0.7.1 (27.4.2014)
+- nove zobrazeni captchy
+
 v0.7.0 (25.4.2014)
 - lokalizace nastaveni a hlasek
 - drobna uprava kodu a logovani

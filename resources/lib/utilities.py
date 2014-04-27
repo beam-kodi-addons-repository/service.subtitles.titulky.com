@@ -108,23 +108,3 @@ def extract_subtitles(archive_dir):
         if os.path.splitext(extracted_file)[1] in exts:
           extracted_subtitles.append(os.path.join(basepath, extracted_file))
     return extracted_subtitles
-
-class CaptchaInputWindow(xbmcgui.WindowDialog):
-   def __init__(self, *args, **kwargs):
-      self.cptloc = kwargs.get('captcha')
-      title_text = kwargs.get('title_text')
-      log(__name__, self.cptloc)
-      self.img = xbmcgui.ControlImage(390,580,500,90,self.cptloc)
-      self.addControl(self.img)
-      self.kbd = xbmc.Keyboard('',title_text,False)
-
-   def get(self):
-      self.show()
-      self.kbd.doModal()
-      if (self.kbd.isConfirmed()):
-         text = self.kbd.getText()
-         self.close()
-         return text
-      self.close()
-      return False
-

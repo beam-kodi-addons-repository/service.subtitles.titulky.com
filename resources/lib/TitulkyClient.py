@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*- 
 
-from utilities import log, get_file_size, CaptchaInputWindow
+from utilities import log, get_file_size
 import urllib, re, os, xbmc, xbmcgui
 import urllib2, cookielib
 import HTMLParser
 import time,calendar
+from captcha import ask_for_captcha
 
 class TitulkyClient(object):
 
@@ -33,8 +34,7 @@ class TitulkyClient(object):
 			img_file.write(captcha_contect)
 			img_file.close()
 
-			solver = CaptchaInputWindow(captcha = captcha_file, title_text = self._t(32013))
-			solution = solver.get()
+			solution = ask_for_captcha(self.addon, captcha_file, self._t(32013))
 			if solution:
 				log(__name__,'Solution provided: %s' % solution)
 				content = self.get_subtitle_download_page_content(sub_id, solution)
@@ -264,7 +264,7 @@ class TitulkyClient(object):
 		cookies_string += "LogonId=" + self.cookies['LogonId'] + "; "
 		cookies_string += "CRC=" + self.cookies['CRC']
 		if 'PHPSESSID' in self.cookies: cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
-			
+
 		request.add_header('Cookie',cookies_string)
 		log(__name__, "Adding cookies into header")
 		return request

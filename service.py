@@ -33,7 +33,7 @@ def Search(item):
   #### Do whats needed to get the list of subtitles from service site
   #### use item["some_property"] that was set earlier
   #### once done, set xbmcgui.ListItem() below and pass it to xbmcplugin.addDirectoryItem()
-  
+
   cli = SubtitlesClient(__addon__)
   found_subtitles = cli.search(item)
 
