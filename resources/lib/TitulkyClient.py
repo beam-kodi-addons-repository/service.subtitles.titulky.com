@@ -26,8 +26,7 @@ class TitulkyClient(object):
 		content = self.get_subtitle_download_page_content(sub_id)
 		control_img = self.get_control_image(content)
 		if not control_img == None:
-			log(__name__,'Found control image :(, asking user for input')
-			log(__name__,'Download control image')
+			log(__name__,'Captcha required. Downloading control image.')
 			captcha_contect = self.get_file(control_img)
 			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img")
 			img_file = open(captcha_file,'wb')
