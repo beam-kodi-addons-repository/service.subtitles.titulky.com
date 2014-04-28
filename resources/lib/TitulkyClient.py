@@ -132,7 +132,7 @@ class TitulkyClient(object):
 	def search(self,item):
 		if item['mansearch']:
 			title = item['mansearchstr']
-		elif not ((item['tvshow'] == None) or (item['tvshow'] == '')):
+		elif item['tvshow']:
 			title = "%s S%02dE%02d" % (item['tvshow'], int(item['season']), int(item['episode'])) # Searching TV Show
 		else:
 			title = item['title'] # Searching movie
