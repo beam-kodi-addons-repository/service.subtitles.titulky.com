@@ -6,6 +6,7 @@ import urllib2, cookielib
 import HTMLParser
 import time,calendar
 from captcha import ask_for_captcha
+from stats import send_statistics
 
 class TitulkyClient(object):
 
@@ -170,6 +171,10 @@ class TitulkyClient(object):
 			})
 
 		log(__name__,["Search result", result_subtitles])
+
+		# call statistics
+		if self.addon.getSetting("send_statistics") == "true": send_statistics('search', self.addon, title, item, len(result_subtitles))
+
 		return result_subtitles
 
 	def filter_subtitles_by_language(self, set_languages, subtitles_list):
