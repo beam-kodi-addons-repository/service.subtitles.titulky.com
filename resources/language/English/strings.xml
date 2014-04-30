@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-    <string id="32001">Copy subtitles next to the video if video is played from rar archive</string>
-    <string id="32002">Saving</string>
-    <string id="32003">Select TV Show</string>
-    <string id="32004">Select file</string>
-    <string id="32005">Searching</string>
-    <string id="32006">Ignore articles when searching ('The')</string>
-    <string id="32007">Use TV show year as filter for searching</string>
-    <string id="32008">Account</string>
-    <string id="32009">Username</string>
-    <string id="32010">Password</string>
-    <string id="32011">Use text in brackets as search pattern and normalize</string>
     <string id="32012">Login to Titulky.com failed. Check your username/password at the addon configuration</string>
     <string id="32013">Enter code from image</string>
     <string id="32014">Invalid control text</string>
     <string id="32015">Download will start in %i seconds</string>
+
+    <string id="32900">Saving</string>
+    <string id="32901">Copy subtitles next to the video if video is played from rar</string>
+
+    <string id="32910">Searching</string>
+    <string id="32911">Use text in brackets as search pattern and normalize</string>
+
+    <string id="32920">Account</string>
+    <string id="32921">Username</string>
+    <string id="32922">Password</string>
+
 </strings>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <category label="32008">
-      <setting id="username" type="text" label="32009" default=""/>
-      <setting id="password" type="text" option="hidden" label="32010" default=""/>
+    <category label="32920">
+      <setting id="username" type="text" label="32921" default=""/>
+      <setting id="password" type="text" option="hidden" label="32922" default=""/>
     </category>
-    <category label="32005">
-      <setting id="search_title_in_brackets" type="bool" label="32011" default="false"/>
+    <category label="32910">
+      <setting id="search_title_in_brackets" type="bool" label="32911" default="false"/>
     </category>
-    <category label="32002">
-      <setting id="copy_subs_if_rar_played" type="bool" label="32001" default="false" />
+    <category label="32900">
+      <setting id="copy_subs_if_rar_played" type="bool" label="32901" default="false" />
     </category>
 </settings>

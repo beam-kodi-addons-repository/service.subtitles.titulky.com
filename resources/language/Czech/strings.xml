@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-    <string id="32001">Zkopírovat soubor s titulky do adresáře s videem pokud je přehráváno z raru</string>
-    <string id="32002">Ukládání</string>
-    <string id="32003">Vyberte seriál</string>
-    <string id="32004">Vyberte soubor</string>
-    <string id="32005">Vyhledávání</string>
-    <string id="32006">Vynechat člen 'The' z názvu seriálu</string>
-    <string id="32007">Filtrovat seriály podle roku vysílání</string>
-    <string id="32008">Účet</string>
-    <string id="32009">Uživatelské jméno</string>
-    <string id="32010">Heslo</string>
-    <string id="32011">Použít text v závorce ve jméně jako základ pro vyhledávaní</string>
     <string id="32012">Přihlášení se nezdařilo. Zkontrolujte jméno a heslo v nastavení doplňku.</string>
     <string id="32013">Zadejte text z kontrolního obrázku</string>
     <string id="32014">Spatne opsany kontrolni obrazek</string>
     <string id="32015">Stahovani zacne za %i sekund</string>
+
+    <string id="32900">Ukládání</string>
+    <string id="32901">Zkopírovat titulky do adresáře s videem pokud je přehráváno z raru</string>
+
+    <string id="32910">Vyhledávání</string>
+    <string id="32911">Použít text v závorce ve jméně jako základ pro vyhledávaní</string>
+
+    <string id="32920">Účet</string>
+    <string id="32921">Uživatelské jméno</string>
+    <string id="32922">Heslo</string>
 </strings>
