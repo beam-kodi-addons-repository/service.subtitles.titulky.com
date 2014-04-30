@@ -6,7 +6,7 @@ import urllib2, cookielib
 import HTMLParser
 import time,calendar
 from captcha import ask_for_captcha
-from stats import send_statistics
+from stats import results_with_stats
 
 class TitulkyClient(object):
 
@@ -149,7 +149,7 @@ class TitulkyClient(object):
 
 		lang_filetred_found_subtitles = self.filter_subtitles_by_language(item['3let_language'], found_subtitles)
 		log(__name__, ["Language filter", lang_filetred_found_subtitles])
-		if not lang_filetred_found_subtitles: return None
+		if not lang_filetred_found_subtitles: return results_with_stats(None, self.addon, title, item)
 			
 		file_size = get_file_size(item['file_original_path'], item['rar'])
 		if not (file_size == -1): file_size = round(float(file_size)/(1024*1024),2)
@@ -172,10 +172,7 @@ class TitulkyClient(object):
 
 		log(__name__,["Search result", result_subtitles])
 
-		# call statistics
-		if self.addon.getSetting("send_statistics") == "true": send_statistics('search', self.addon, title, item, len(result_subtitles))
-
-		return result_subtitles
+		return results_with_stats(result_subtitles, self.addon, title, item)
 
 	def filter_subtitles_by_language(self, set_languages, subtitles_list):
 		if not set_languages: return subtitles_list

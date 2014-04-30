@@ -10,6 +10,13 @@ if sys.version_info < (2, 7):
 else:
     import json as simplejson
 
+def results_with_stats(results, addon, title, item):
+	if addon.getSetting("send_statistics") == "true":
+		results_count = 0 if (results == None) else len(results)
+		send_statistics("search", addon, title, item, results_count)
+
+	return results
+
 def send_statistics_to_server(data):
 	u = urllib2.urlopen("http://xbmc-repo-stats.bimovi.cz/save.php", urllib.urlencode({"data" : simplejson.dumps(data)}), 10)
 	log("Usage Tracking", [simplejson.dumps(data), u.getcode()])

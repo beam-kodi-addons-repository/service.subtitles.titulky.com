@@ -1,3 +1,7 @@
+v0.8.0 (30.4.2014)
+- moznost odesilani statistik pouzivani (zapnuto)
+- uprava prekladu
+
 v0.7.1 (27.4.2014)
 - nove zobrazeni captchy
 

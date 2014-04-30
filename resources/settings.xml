@@ -10,4 +10,7 @@
     <category label="32900">
       <setting id="copy_subs_if_rar_played" type="bool" label="32901" default="false" />
     </category>
+    <category label="32930">
+      <setting id="send_statistics" type="bool" label="32931" default="true" />
+    </category>
 </settings>
