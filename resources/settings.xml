@@ -5,7 +5,7 @@
       <setting id="password" type="text" option="hidden" label="32922" default=""/>
     </category>
     <category label="32910">
-      <setting id="search_title_in_brackets" type="bool" label="32911" default="false"/>
+      <setting id="search_title_in_brackets" type="bool" label="32911" default="true"/>
     </category>
     <category label="32900">
       <setting id="copy_subs_if_rar_played" type="bool" label="32901" default="false" />
