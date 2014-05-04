@@ -183,10 +183,13 @@ class TitulkyClient(object):
 			if xbmc.convertLanguage(subtitle['lang'],xbmc.ISO_639_2) in set_languages:
 				filter_subtitles_list.append(subtitle)
 
-		if filter_subtitles_list:
-			return filter_subtitles_list
-		else:
+		if not filter_subtitles_list:
+			if "cze" not in set_languages and "slo" not in set_languages:
+				dialog = xbmcgui.Dialog()
+				dialog.ok(self.addon.getAddonInfo('name'), self._t(32100))
 			return None
+		else:
+			return filter_subtitles_list
 
 
 	def detect_max_download_stats(self, subtitle_list):
