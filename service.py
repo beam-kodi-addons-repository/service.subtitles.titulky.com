@@ -107,6 +107,9 @@ def get_params():
 params = get_params()
 
 if params['action'] == 'search' or params['action'] == 'manualsearch':
+  # prepare mac_addr
+  xbmc.getInfoLabel('Network.MacAddress')
+
   item = {}
   item['temp']               = False
   item['rar']                = False

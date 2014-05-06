@@ -3,6 +3,7 @@ import xbmc
 from utilities import log
 from uuid import getnode as uuid_node
 from hashlib import md5
+from time import sleep as sleep
 import urllib, urllib2
 
 if sys.version_info < (2, 7):
@@ -22,23 +23,34 @@ def send_statistics_to_server(data):
 	log("Usage Tracking", [simplejson.dumps(data), u.getcode()])
 	return u.getcode() == 201
 
+def uniq_id(mac_addr):
+	if not ":" in mac_addr: mac_addr = xbmc.getInfoLabel('Network.MacAddress')
+	# hack response busy
+	if not ":" in mac_addr:
+		sleep(2)
+		mac_addr = xbmc.getInfoLabel('Network.MacAddress')
+
+	if ":" in mac_addr:
+		return md5(str(mac_addr.decode("utf-8"))).hexdigest()
+	else:
+		return md5(str(uuid_node())).hexdigest()
+
 def send_statistics(action, addon, title, item, result_count):
 
 	try:
 		info = {
-			'action'		: action,
-			'xbmc_uniq_id' 	: md5(str(uuid_node())).hexdigest()
+			'action'		: action
 		}
-
 		try:
 			data = xbmc.executeJSONRPC('{"jsonrpc" : "2.0", "method": "XBMC.GetInfoLabels", "id" :1, "params": {"labels" : \
-				["System.BuildVersion","System.ScreenHeight","System.ScreenWidth","System.KernelVersion","System.Language"]}}')  
+				["System.BuildVersion","System.ScreenHeight","System.ScreenWidth","System.KernelVersion","System.Language", "Network.MacAddress"]}}')
 			data = simplejson.loads(data)
 
 			info['xbmc_resolution'] 	= '%sx%s' %(data['result']['System.ScreenWidth'],data['result']['System.ScreenHeight'])
 			info['xbmc_language'] 			= data['result']['System.Language']
 			info['xbmc_version'] 		= data['result']['System.BuildVersion']
-		except:
+		except Exception, e:
+			log("Usage Tracking", "Error JSON: %s" % e)
 			pass
 
 		info['system_platform'] 		= sys.platform
@@ -57,6 +69,8 @@ def send_statistics(action, addon, title, item, result_count):
 		info['input_episode']			= item['episode']
 		info['input_tvshow']			= item['tvshow']
 		info['input_title']				= item['title']
+
+		info['xbmc_uniq_id']			= uniq_id(data['result']['Network.MacAddress'])
 
 		return send_statistics_to_server(info)
 	except Exception, e:

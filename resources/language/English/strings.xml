@@ -6,6 +6,7 @@
     <string id="32015">Download will start in %i seconds</string>
 
     <string id="32100">Addon is only for czech and slovak subtitles. Check the settings of the language for which you want to download subtitles.</string>
+    <string id="32101">Open settings?</string>
 
     <string id="32900">Saving</string>
     <string id="32901">Copy subtitles next to the video if video is played from rar</string>

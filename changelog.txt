@@ -1,3 +1,6 @@
+v0.9.1 (6.5.2014)
+- dialog s nabidkou otevrit nastaveni jazyku titulku pokud jsou nastaveny spatne
+
 v0.9.0 (4.5.2014)
 - upozorneni pokud je spatne nastaveny jazyk pro vyhledavani titulku
 

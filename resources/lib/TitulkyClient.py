@@ -186,7 +186,8 @@ class TitulkyClient(object):
 		if not filter_subtitles_list:
 			if "cze" not in set_languages and "slo" not in set_languages:
 				dialog = xbmcgui.Dialog()
-				dialog.ok(self.addon.getAddonInfo('name'), self._t(32100))
+				if dialog.yesno(self.addon.getAddonInfo('name'), self._t(32100), self._t(32101)):
+					xbmc.executebuiltin("ActivateWindow(videossettings)")
 			return None
 		else:
 			return filter_subtitles_list
