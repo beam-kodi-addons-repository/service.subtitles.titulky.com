@@ -1,3 +1,6 @@
+v0.9.2 (6.5.2014)
+- zakladni zpracovani souboru mimo knihovnu
+
 v0.9.1 (6.5.2014)
 - dialog s nabidkou otevrit nastaveni jazyku titulku pokud jsou nastaveny spatne
 

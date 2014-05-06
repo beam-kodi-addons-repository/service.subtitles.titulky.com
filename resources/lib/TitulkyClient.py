@@ -134,8 +134,8 @@ class TitulkyClient(object):
 			title = item['mansearchstr']
 		elif item['tvshow']:
 			title = "%s S%02dE%02d" % (item['tvshow'], int(item['season']), int(item['episode'])) # Searching TV Show
-		else:
-			title = item['title'] # Searching movie
+		else: # Searching movie
+			title = item['title'] if item['year'] else xbmc.getCleanMovieTitle(item['title'])[0]
 			if self.addon.getSetting("search_title_in_brackets") == "true":
 				log(__name__, "Searching title in brackets - %s" % title)
 				search_second_title = re.match(r'.+ \((.+)\)',title)
