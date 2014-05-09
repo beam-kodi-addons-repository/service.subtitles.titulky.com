@@ -1,3 +1,6 @@
+v0.9.3 (9.5.2014)
+- uprava podminky pro vyber textu ze zavorek, nesmi to byt rok
+
 v0.9.2 (6.5.2014)
 - zakladni zpracovani souboru mimo knihovnu
 

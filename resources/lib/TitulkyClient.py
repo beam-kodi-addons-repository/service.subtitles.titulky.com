@@ -139,7 +139,7 @@ class TitulkyClient(object):
 			if self.addon.getSetting("search_title_in_brackets") == "true":
 				log(__name__, "Searching title in brackets - %s" % title)
 				search_second_title = re.match(r'.+ \((.+)\)',title)
-				if search_second_title: title = search_second_title.group(1)
+				if search_second_title and not re.search(r'^[\d]{4}$',search_second_title.group(1)): title = search_second_title.group(1)
 				if re.search(r', The$',title,re.IGNORECASE): title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
 
 		log(__name__, "Search pattern: " + title)
