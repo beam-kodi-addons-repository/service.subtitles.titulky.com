@@ -65,6 +65,7 @@ def Download(sub_id, lang):
 
   cli = SubtitlesClient(__addon__)
   if not cli.login(__addon__.getSetting("username"), __addon__.getSetting("password")):
+    log(__scriptname__,"Login failed")
     dialog = xbmcgui.Dialog()
     dialog.ok(__scriptname__,__language__(32012))
     return []
@@ -148,6 +149,7 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
     stackPath = item['file_original_path'].split(" , ")
     item['file_original_path'] = stackPath[0][8:]
   
+  log(__scriptname__,["Input", item])
   Search(item)  
 
 elif params['action'] == 'download':
