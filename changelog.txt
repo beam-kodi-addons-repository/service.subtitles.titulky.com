@@ -1,3 +1,6 @@
+v0.9.4 (11.5.2014)
+- debug log vstupu
+
 v0.9.3 (9.5.2014)
 - uprava podminky pro vyber textu ze zavorek, nesmi to byt rok
 
