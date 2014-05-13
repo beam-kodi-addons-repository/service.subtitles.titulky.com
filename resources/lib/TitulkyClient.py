@@ -129,18 +129,23 @@ class TitulkyClient(object):
 		response.close()
 		return content
 	
+	def get_title_from_brackets(self, title):
+		if self.addon.getSetting("search_title_in_brackets") == "true":
+			log(__name__, "Searching title in brackets - %s" % title)
+			search_second_title = re.match(r'.+ \((.+)\)',title)
+			if search_second_title and not re.search(r'^[\d]{4}$',search_second_title.group(1)): title = search_second_title.group(1)
+			if re.search(r', The$',title,re.IGNORECASE): title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
+		return title.strip()
+
 	def search(self,item):
+
 		if item['mansearch']:
 			title = item['mansearchstr']
 		elif item['tvshow']:
-			title = "%s S%02dE%02d" % (item['tvshow'], int(item['season']), int(item['episode'])) # Searching TV Show
+			title = "%s S%02dE%02d" % (self.get_title_from_brackets(item['tvshow']), int(item['season']), int(item['episode'])) # Searching TV Show
 		else: # Searching movie
 			title = item['title'] if item['year'] else xbmc.getCleanMovieTitle(item['title'])[0]
-			if self.addon.getSetting("search_title_in_brackets") == "true":
-				log(__name__, "Searching title in brackets - %s" % title)
-				search_second_title = re.match(r'.+ \((.+)\)',title)
-				if search_second_title and not re.search(r'^[\d]{4}$',search_second_title.group(1)): title = search_second_title.group(1)
-				if re.search(r', The$',title,re.IGNORECASE): title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
+			title = self.get_title_from_brackets(title)
 
 		log(__name__, "Search pattern: " + title)
 

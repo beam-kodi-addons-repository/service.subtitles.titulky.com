@@ -1,3 +1,6 @@
+v0.9.5 (13.5.2014)
+- pouzit text v zavorkach jako text pro vyhledavani i pro serialy
+
 v0.9.4 (11.5.2014)
 - debug log vstupu
 
