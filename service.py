@@ -25,7 +25,7 @@ __temp__       = xbmc.translatePath( os.path.join( __profile__, 'temp') ).decode
 
 sys.path.append (__resource__)
 
-from utilities import log, extract_subtitles, copy_subtitles_on_rar
+from utilities import log, extract_subtitles
 from TitulkyClient import TitulkyClient as SubtitlesClient
 
 def Search(item):
@@ -78,8 +78,6 @@ def Download(sub_id, lang):
   log(__scriptname__,subtitle_list)
   # subtitle_list.append("/Path/Of/Subtitle2.srt") # this can be url, local path or network path.
   
-  if __addon__.getSetting("copy_subs_if_rar_played") == "true": copy_subtitles_on_rar(subtitle_list,lang)
-
   return subtitle_list
  
 def normalizeString(str):
