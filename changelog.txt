@@ -1,3 +1,9 @@
+v1.0.0 (27.7.2014)
+- doplneni zavislosti
+- uprava vytazeni nazvu ze zavorek (minimalne 3 znaky)
+- zruseni moznosti ukladani titulku k prehravanemu souboru z .raru (od xbmc 13.1 neni potreba)
+- pridan slovensky preklad
+
 v0.9.5 (13.5.2014)
 - pouzit text v zavorkach jako text pro vyhledavani i pro serialy
 
