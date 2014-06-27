@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <string id="32012">Prihlásenie sa nepodarilo. Skontrolujte meno a heslo v nastavení doplnku.</string>
+    <string id="32013">Zadajte text z kontrolného obrázku</string>
+    <string id="32014">Zle opisanej kontrolny obrazok</string>
+    <string id="32015">Stahovanie zacne za %i sekund</string>
+
+    <string id="32100">Doplnok je určený pre slovenských a českých titulky, skontrolujte Vaše nastavenia jazykov, pre ktoré chcete titulky sťahovať.</string>
+    <string id="32101">Otvoriť nastavenia?</string>
+
+    <string id="32910">Vyhľadávanie</string>
+    <string id="32911">Použít text v závorce ve jméně jako základ pro vyhledávaní</string>
+
+    <string id="32920">Účet</string>
+    <string id="32921">Užívateľské meno</string>
+    <string id="32922">Heslo</string>
+
+    <string id="32930">Štatistiky</string>
+    <string id="32931">Odosielať anonymné štatistiky o využití doplnku</string>
+</strings>
