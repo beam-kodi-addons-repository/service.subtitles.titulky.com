@@ -135,8 +135,14 @@ class TitulkyClient(object):
 			search_second_title = re.match(r'.+ \((.{3,})\)',title)
 			if search_second_title and not re.search(r'^[\d]{4}$',search_second_title.group(1)): title = search_second_title.group(1)
 		
-		if re.search(r', The$',title,re.IGNORECASE): title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
+		if re.search(r', The$',title,re.IGNORECASE):
+			log(__name__, "Swap The - %s" % title)
+			title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
 		
+		if self.addon.getSetting("try_cleanup_title") == "true":
+			log(__name__, "Title cleanup - %s" % title)
+			title = re.sub(r"(\[|\().+?(\]|\))","",title) # remove [xy] and (xy)
+
 		return title.strip()
 
 	def search(self,item):

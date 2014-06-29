@@ -10,6 +10,7 @@
 
     <string id="32910">Searching</string>
     <string id="32911">Use text in brackets as search pattern and normalize</string>
+    <string id="32914">Clean title search prior to the excess text (brackets, formatting, etc.).</string>
 
     <string id="32920">Account</string>
     <string id="32921">Username</string>

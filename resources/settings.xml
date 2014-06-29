@@ -6,6 +6,7 @@
     </category>
     <category label="32910">
       <setting id="search_title_in_brackets" type="bool" label="32911" default="true"/>
+      <setting id="try_cleanup_title" type="bool" label="32914" default="true" />
     </category>
     <category label="32930">
       <setting id="send_statistics" type="bool" label="32931" default="true" />
