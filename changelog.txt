@@ -1,3 +1,6 @@
+v1.2.0 (23.10.2014)
+- oprava vycisteni tmp adresare (Helix)
+
 v1.1.0 (29.7.2014)
 - moznost vycisteni textu o zavorky, formatovani, atd (zapnuto)
 
