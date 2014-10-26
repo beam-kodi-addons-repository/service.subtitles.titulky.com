@@ -6,7 +6,7 @@ import urllib2, cookielib
 import HTMLParser
 import time,calendar
 from captcha import ask_for_captcha
-from stats import results_with_stats
+from usage_stats import results_with_stats
 
 class TitulkyClient(object):
 
