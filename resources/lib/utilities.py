@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 import os
 import xbmc, xbmcvfs, xbmcgui
 from struct import Struct
 import urllib
+import codecs
 
 def log(module, msg):
     xbmc.log((u"### [%s] - %s" % (module, msg,)).encode('utf-8'), level=xbmc.LOGDEBUG)
@@ -67,6 +68,26 @@ def get_file_size_from_rar(first_rar_filename):
     else:
         return None
 
+CZECH_ALPHABET = "aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzž"
+CZECH_ALPHABET += CZECH_ALPHABET.upper()
+PUCTUATION = ".,?!:() -;\n\r\t"
+DIGITS = "0123456789"
+SPECIAL_CHARACTERS = """<>'"#\/"""
+ENCODINGS = ["cp1250","iso-8859-2","utf-8"]
+
+
+def get_best_encoding(text):
+    scores = []
+    for priority, encoding in enumerate(ENCODINGS):
+        try:
+            decoded = codecs.decode(text,encoding=encoding)
+            wrongness = len(
+                [char for char in decoded if char not in (CZECH_ALPHABET + PUCTUATION + DIGITS + SPECIAL_CHARACTERS)])
+        except ValueError:
+            wrongness = float("inf")
+        scores.append({"encoding": encoding, "score":(wrongness,priority)})
+    return min(scores,key=lambda x: x["score"])["encoding"]
+
 
 def extract_subtitles(archive_dir):
     xbmc.executebuiltin(('XBMC.Extract("%s")' % archive_dir).encode('utf-8'))
@@ -80,5 +101,11 @@ def extract_subtitles(archive_dir):
     else:
       for extracted_file in extracted_files:
         if os.path.splitext(extracted_file)[1] in exts:
-          extracted_subtitles.append(os.path.join(basepath, extracted_file))
+          filepath = os.path.join(basepath, extracted_file)
+          with open(filepath,"rb") as f:
+              text = f.read()
+          encoding = get_best_encoding(text)
+          with open(filepath,"wb") as f:
+              f.write(codecs.encode(codecs.decode(text,encoding,"ignore"),"utf-8","ignore"))
+          extracted_subtitles.append(filepath)
     return extracted_subtitles
