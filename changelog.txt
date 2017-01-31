@@ -1,3 +1,6 @@
+v1.3.0 (1.2.2017)
+- prechod na HTTPS verzi stranek
+
 v1.2.1 (26.10.2014)
 - interni upravy (prejmenovani stats na usage_stats)
 

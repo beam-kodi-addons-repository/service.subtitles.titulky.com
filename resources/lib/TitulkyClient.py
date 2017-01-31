@@ -11,7 +11,7 @@ from usage_stats import results_with_stats
 class TitulkyClient(object):
 
 	def __init__(self,addon):
-		self.server_url = 'http://www.titulky.com'
+		self.server_url = 'https://www.titulky.com'
 		self.addon = addon
 		self._t = addon.getLocalizedString
 
