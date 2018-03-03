@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 from utilities import log, get_file_size
 import urllib, re, os, xbmc, xbmcgui
@@ -6,7 +6,7 @@ import urllib2, cookielib
 import HTMLParser
 import time,calendar
 from captcha import ask_for_captcha
-from usage_stats import results_with_stats
+from usage_stats import results_with_stats, mark_start_time
 
 class TitulkyClient(object):
 
@@ -15,12 +15,14 @@ class TitulkyClient(object):
 		self.addon = addon
 		self._t = addon.getLocalizedString
 
+		mark_start_time()
+
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
 		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 ( .NET CLR 3.5.30729)')]
 		urllib2.install_opener(opener)
 
 	def download(self,sub_id):
-		
+
 		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile').decode("utf-8")), 'temp')
 		dest = os.path.join(dest_dir, "download.zip")
 
@@ -128,17 +130,17 @@ class TitulkyClient(object):
 		log(__name__,'Opening done')
 		response.close()
 		return content
-	
+
 	def normalize_input_title(self, title):
 		if self.addon.getSetting("search_title_in_brackets") == "true":
 			log(__name__, "Searching title in brackets - %s" % title)
 			search_second_title = re.match(r'.+ \((.{3,})\)',title)
 			if search_second_title and not re.search(r'^[\d]{4}$',search_second_title.group(1)): title = search_second_title.group(1)
-		
+
 		if re.search(r', The$',title,re.IGNORECASE):
 			log(__name__, "Swap The - %s" % title)
 			title =  "The " + re.sub(r'(?i), The$',"", title) # normalize The
-		
+
 		if self.addon.getSetting("try_cleanup_title") == "true":
 			log(__name__, "Title cleanup - %s" % title)
 			title = re.sub(r"(\[|\().+?(\]|\))","",title) # remove [xy] and (xy)
@@ -163,7 +165,7 @@ class TitulkyClient(object):
 		lang_filetred_found_subtitles = self.filter_subtitles_by_language(item['3let_language'], found_subtitles)
 		log(__name__, ["Language filter", lang_filetred_found_subtitles])
 		if not lang_filetred_found_subtitles: return results_with_stats(None, self.addon, title, item)
-			
+
 		file_size = get_file_size(item['file_original_path'], item['rar'])
 		if not (file_size == -1): file_size = round(float(file_size)/(1024*1024),2)
 		log(__name__, "File size: %s" % file_size)
@@ -174,7 +176,7 @@ class TitulkyClient(object):
 		for found_subtitle in lang_filetred_found_subtitles:
 			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '' or found_subtitle['version'] == None]
 			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
-			result_subtitles.append({ 
+			result_subtitles.append({
 				'filename': HTMLParser.HTMLParser().unescape(print_out_filename),
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
@@ -286,5 +288,3 @@ class TitulkyClient(object):
 		request.add_header('Cookie',cookies_string)
 		log(__name__, "Adding cookies into header")
 		return request
-
-
