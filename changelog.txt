@@ -1,3 +1,6 @@
+v1.4.1 (24.4.2019)
+- oprava diakritiky v prekladech
+
 v1.4.0 (3.3.2018)
 - oprava otevirani okna s vyberem nastaveni jazyku pro stazeni
 

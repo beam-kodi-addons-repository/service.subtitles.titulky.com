@@ -2,8 +2,8 @@
 <strings>
     <string id="32012">Přihlášení se nezdařilo. Zkontrolujte jméno a heslo v nastavení doplňku.</string>
     <string id="32013">Zadejte text z kontrolního obrázku</string>
-    <string id="32014">Spatne opsany kontrolni obrazek</string>
-    <string id="32015">Stahovani zacne za %i sekund</string>
+    <string id="32014">Špatně opsaný kontrolní obrázek</string>
+    <string id="32015">Stahování začne za %i sekund</string>
 
     <string id="32100">Doplněk je určen pro české a slovenské titulky, zkontrolujte Vaše nastavení jazyků, pro které chcete titulky stahovat.</string>
     <string id="32101">Otevřít nastavení?</string>
