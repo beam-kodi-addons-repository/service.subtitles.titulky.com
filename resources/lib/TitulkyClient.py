@@ -43,10 +43,10 @@ class TitulkyClient(object):
 				control_img = self.get_control_image(content)
 				if not control_img == None:
 					log(__name__,'Invalid control text')
-					xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
+					xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
 						self.addon.getAddonInfo('name'), self._t(32014),
 						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
-					))
+					)).encode("utf-8"))
 					return None
 				log(__name__,'Control image OK')
 			else:
@@ -58,11 +58,11 @@ class TitulkyClient(object):
 		link = self.get_final_download_link(content)
 		log(__name__,'Got the link, wait %i seconds before download' % (wait_time))
 		for i in range(wait_time + 1):
-			xbmc.executebuiltin("XBMC.Notification(%s,%s,1000,%s)" % (
+			xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
 				self.addon.getAddonInfo('name'),
 				self._t(32015) % (wait_time - i),
 				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
-			))
+			)).encode("utf-8"))
 			time.sleep(1)
 
 		log(__name__,'Downloading subtitle zip from %s' % link)
