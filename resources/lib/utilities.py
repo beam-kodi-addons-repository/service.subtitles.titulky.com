@@ -72,7 +72,7 @@ def extract_subtitles(archive_dir):
     xbmc.executebuiltin(('XBMC.Extract("%s")' % archive_dir).encode('utf-8'))
     xbmc.sleep(1000)
     basepath = os.path.dirname(archive_dir)
-    extracted_files = os.listdir(basepath)
+    extracted_files = os.listdir(basepath.decode('utf8'))
     exts = [".srt", ".sub", ".txt", ".smi", ".ssa", ".ass" ]
     extracted_subtitles = []
     if len(extracted_files) < 1 :
