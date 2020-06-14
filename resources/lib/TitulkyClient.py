@@ -23,7 +23,7 @@ class TitulkyClient(object):
 
 	def download(self,sub_id):
 
-		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile').decode("utf-8")), 'temp')
+		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), 'temp').decode("utf-8")
 		dest = os.path.join(dest_dir, "download.zip")
 
 		content = self.get_subtitle_download_page_content(sub_id)
@@ -31,7 +31,7 @@ class TitulkyClient(object):
 		if not control_img == None:
 			log(__name__,'Captcha required. Downloading control image.')
 			captcha_contect = self.get_file(control_img)
-			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img").decode("utf8")
+			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img")
 			img_file = open(captcha_file,'wb')
 			img_file.write(captcha_contect)
 			img_file.close()
@@ -45,7 +45,7 @@ class TitulkyClient(object):
 					log(__name__,'Invalid control text')
 					xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
 						self.addon.getAddonInfo('name'), self._t(32014),
-						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
+						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')),'icon.png').decode("utf-8")
 					)).encode("utf-8"))
 					return None
 				log(__name__,'Control image OK')
@@ -61,7 +61,7 @@ class TitulkyClient(object):
 			xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
 				self.addon.getAddonInfo('name'),
 				self._t(32015) % (wait_time - i),
-				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')).decode("utf-8"),'icon.png')
+				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')),'icon.png').decode("utf-8")
 			)).encode("utf-8"))
 			time.sleep(1)
 
@@ -71,7 +71,7 @@ class TitulkyClient(object):
 		subtitles_data = self.get_file(link)
 
 		log(__name__,'Saving to file %s' % dest)
-		zip_file = open(dest.decode('utf8'),'wb')
+		zip_file = open(dest,'wb')
 		zip_file.write(subtitles_data)
 		zip_file.close()
 

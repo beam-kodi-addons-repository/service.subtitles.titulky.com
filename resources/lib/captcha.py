@@ -9,7 +9,7 @@ class CaptchaWindow( xbmcgui.WindowXMLDialog ):
         self.kbd = xbmc.Keyboard('',title_text,False)
 
     def onInit(self):
-        self.getControl(101).setImage(self.img)
+        self.getControl(101).setImage(self.img.encode('utf8'))
 
     def get(self):
         self.show()
