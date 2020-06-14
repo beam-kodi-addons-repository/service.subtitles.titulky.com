@@ -1,0 +1,47 @@
+name: Create kodi package and release
+on: 
+  release:
+    types: created
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Ruby 2.6
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+      - name: Fetch Repository Managment
+        run: git clone --depth 1 https://github.com/beam-kodi-addons-repository/repository-managment.git
+      - name: Install Repository Managment Dependencies
+        run: bundle install
+        working-directory: repository-managment
+      - name: Pull source
+        uses: actions/checkout@v2
+        with:
+          path: source-code
+      - name: Create package
+        run: repository-managment/create-package.rb -r source-code -t $GITHUB_REF
+      - name: Set environment variable with release filename
+        run: echo "::set-env name=RELEASE_FILENAME::$(cat RELEASE_NAME)"
+      - name: set environment variable with GH release ID
+        run: echo "::set-env name=RELEASE_ID::$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)"
+      - name: Upload release zip to Github Releases
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: https://uploads.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}/assets{?name,label}
+          asset_path: ./${{ env.RELEASE_FILENAME }}
+          asset_name: ${{ env.RELEASE_FILENAME }}
+          asset_content_type: application/zip
+      - name: Create pull request to kodi repository
+        run: repository-managment/update-package-list.rb -e $PKG_TYPE -u $PKG_LST_USER -n $PKG_LST_REPO -t $GITHUB_REF -r ${{ github.repository }} -f ${{ env.RELEASE_FILENAME }}
+        env:
+          PKG_TYPE: gh-release
+          PKG_LST_USER: beam-kodi-addons-repository
+          PKG_LST_REPO: repository-packages
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.KEY_FOR_PULL_REQUEST }}
+          GIT_USER_NAME: Beam (GitHub Actions)
+          GIT_USER_EMAIL: ondra+github-actions@bimovi.cz
