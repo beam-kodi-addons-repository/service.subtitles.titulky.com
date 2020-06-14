@@ -31,7 +31,7 @@ class TitulkyClient(object):
 		if not control_img == None:
 			log(__name__,'Captcha required. Downloading control image.')
 			captcha_contect = self.get_file(control_img)
-			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img")
+			captcha_file = os.path.join(dest_dir, str(calendar.timegm(time.gmtime())) + "-captcha.img").decode("utf8")
 			img_file = open(captcha_file,'wb')
 			img_file.write(captcha_contect)
 			img_file.close()
@@ -71,7 +71,7 @@ class TitulkyClient(object):
 		subtitles_data = self.get_file(link)
 
 		log(__name__,'Saving to file %s' % dest)
-		zip_file = open(dest,'wb')
+		zip_file = open(dest.decode('utf8'),'wb')
 		zip_file.write(subtitles_data)
 		zip_file.close()
 
