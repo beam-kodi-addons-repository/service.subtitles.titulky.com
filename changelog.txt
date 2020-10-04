@@ -1,3 +1,6 @@
+v1.5.1 (2.10.2020)
+- opravene stahovani titulku ( uvidime jak dlouho to vydrzi :/ )
+
 v1.5.0 (14.6.2020)
 - podpora Win uzivatel s diakritikou
 

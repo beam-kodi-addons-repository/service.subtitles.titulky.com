@@ -18,7 +18,7 @@ class TitulkyClient(object):
 		mark_start_time()
 
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
-		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 ( .NET CLR 3.5.30729)')]
+		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36')]
 		urllib2.install_opener(opener)
 
 	def download(self,sub_id):
@@ -68,7 +68,7 @@ class TitulkyClient(object):
 		log(__name__,'Downloading subtitle zip from %s' % link)
 
 		# DOWNLOAD FILE
-		subtitles_data = self.get_file(link)
+		subtitles_data = self.get_file(link, "https://www.titulky.com/idown.php")
 
 		log(__name__,'Saving to file %s' % dest)
 		zip_file = open(dest,'wb')
@@ -77,9 +77,12 @@ class TitulkyClient(object):
 
 		return dest
 
-	def get_file(self,link):
+	def get_file(self,link, referer = None):
 		req = urllib2.Request(link)
 		req = self.add_cookies_into_header(req)
+		if not referer == None:
+			req.add_header('Referer', referer)
+
 		response = urllib2.urlopen(req)
 
 		if response.headers.get('Set-Cookie'):
