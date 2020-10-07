@@ -270,7 +270,7 @@ class TitulkyClient(object):
 	def login(self,username,password):
 		log(__name__,'Logging in to Titulky.com')
 		if not username: return False
-		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '1','Detail2':''} )
+		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '0','Detail2':''} )
 		request = urllib2.Request(self.server_url + '/index.php',login_postdata)
 		response = urllib2.urlopen(request)
 		log(__name__,'Got response')
