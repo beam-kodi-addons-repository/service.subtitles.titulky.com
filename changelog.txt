@@ -1,3 +1,7 @@
+v1.6.0 (6.10.2020)
+- stahovani je mozne jen pro premium uzivatele
+- moznost externe rozsirit doplnek
+
 v1.5.1 (2.10.2020)
 - opravene stahovani titulku ( uvidime jak dlouho to vydrzi :/ )
 

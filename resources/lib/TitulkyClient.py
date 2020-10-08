@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from utilities import log, get_file_size
-import urllib, re, os, xbmc, xbmcgui
+from utilities import log, get_file_size, get_content_from_response
+import urllib, re, os, xbmc, xbmcgui, sys
 import urllib2, cookielib
 import HTMLParser
 import time,calendar
+
+if sys.version_info < (2, 7):
+    import simplejson
+else:
+    import json as simplejson
+
 from captcha import ask_for_captcha
 from usage_stats import results_with_stats, mark_start_time
 
@@ -16,9 +22,12 @@ class TitulkyClient(object):
 		self._t = addon.getLocalizedString
 
 		mark_start_time()
+		self.load_extra_commands()
 
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
-		opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36')]
+		opener.addheaders = []
+		if self.extra_commands.has_key("add_headers"):
+			for header in self.extra_commands["add_headers"]: opener.addheaders += [(header['name'], header['value'])]
 		urllib2.install_opener(opener)
 
 	def download(self,sub_id):
@@ -83,13 +92,18 @@ class TitulkyClient(object):
 		if not referer == None:
 			req.add_header('Referer', referer)
 
+		if self.extra_commands.has_key('get_file_before'): exec(self.extra_commands["get_file_before"])
+
 		response = urllib2.urlopen(req)
 
 		if response.headers.get('Set-Cookie'):
 			phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
 			if phpsessid: self.cookies['PHPSESSID'] = phpsessid.group(1)
 
-		data = response.read()
+		data = get_content_from_response(response)
+
+		if self.extra_commands.has_key('get_file_after'): exec(self.extra_commands["get_file_after"])
+
 		return data
 
 	def get_wait_time(self,content):
@@ -128,6 +142,11 @@ class TitulkyClient(object):
 			req = urllib2.Request(url,urllib.urlencode(post_data))
 
 		req = self.add_cookies_into_header(req)
+		if not referer == None:
+			req.add_header('Referer', referer )
+
+		if self.extra_commands.has_key('download_before'): exec(self.extra_commands["download_before"])
+
 		response = urllib2.urlopen(req)
 		content = response.read()
 		log(__name__,'Opening done')
@@ -228,6 +247,9 @@ class TitulkyClient(object):
 		log(__name__, "Opening: %s" % url)
 
 		req = urllib2.Request(url)
+
+		if self.extra_commands.has_key('search_before'): exec(self.extra_commands["search_before"])
+
 		response = urllib2.urlopen(req)
 		content = response.read()
 		response.close()
@@ -263,7 +285,12 @@ class TitulkyClient(object):
 				subtitle['author'] = re.search('((.+?)</td>){8}[^>]+>[^>]+<a href[^>]+>(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL | re.MULTILINE ).group('data').strip()
 			except:
 				subtitle['author'] = None
+
+			if self.extra_commands.has_key('search_parse'): exec(self.extra_commands["search_parse"])
+
 			subtitles.append(subtitle)
+
+		if self.extra_commands.has_key('search_after'): exec(self.extra_commands["search_after"])
 
 		return subtitles
 
@@ -272,9 +299,17 @@ class TitulkyClient(object):
 		if not username: return False
 		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '0','Detail2':''} )
 		request = urllib2.Request(self.server_url + '/index.php',login_postdata)
+		request.add_header('Origin',  self.server_url)
+
+		if self.extra_commands.has_key('login_before'):
+			do_return = None
+			exec(self.extra_commands["login_before"])
+			if do_return != None: return do_return
+
 		response = urllib2.urlopen(request)
-		log(__name__,'Got response')
-		if response.read().find('BadLogin')>-1: return False
+		content = get_content_from_response(response)
+
+		if content.find('BadLogin')>-1: return False
 
 		log(__name__,'Storing Cookies')
 		self.cookies = {}
@@ -282,14 +317,36 @@ class TitulkyClient(object):
 		self.cookies['LogonLogin'] = re.search('LogonLogin=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
 		self.cookies['LogonId'] = re.search('LogonId=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
 
+		if self.extra_commands.has_key('login_after'):
+			do_return = None
+			exec(self.extra_commands["login_after"])
+			if do_return != None: return do_return
+
+		content = self.get_file(self.server_url + "/?Registration=Edit")
+		if content.find("<a id=\"userNickName\" title=\"TOP ") == -1:
+			log(__name__, "Normalni uzivatel")
+			dialog = xbmcgui.Dialog()
+			dialog.ok(self.addon.getAddonInfo('name'),self.addon.getLocalizedString(32940))
+		else:
+			log(__name__,"Premium uzivatel")
+
 		return True
 
 	def add_cookies_into_header(self,request):
-		cookies_string = "LogonLogin=" + self.cookies['LogonLogin'] + "; "
-		cookies_string += "LogonId=" + self.cookies['LogonId'] + "; "
-		cookies_string += "CRC=" + self.cookies['CRC']
-		if 'PHPSESSID' in self.cookies: cookies_string += "; PHPSESSID=" + self.cookies['PHPSESSID']
+		cookies_string = ""
+		for cookie in self.cookies: cookies_string += "%s=%s; " % (cookie, self.cookies[cookie])
+
+		if self.extra_commands.has_key("add_cookies"):
+			for cookie in self.extra_commands["add_cookies"]: cookies_string +=  "%s=%s; " % (cookie, self.extra_commands["add_cookies"][cookie])
 
 		request.add_header('Cookie',cookies_string)
 		log(__name__, "Adding cookies into header")
 		return request
+
+	def load_extra_commands(self):
+		self.extra_commands = {}
+		extra_commands_file = xbmc.translatePath( os.path.join(self.addon.getAddonInfo('profile'), 'extra_commands.json') ).decode("utf-8")
+		if os.path.exists(extra_commands_file):
+			ext_file = open(extra_commands_file, "r")
+			self.extra_commands = simplejson.loads(ext_file.read())
+			ext_file.close()
