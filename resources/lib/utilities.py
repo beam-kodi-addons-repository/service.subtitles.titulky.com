@@ -5,6 +5,9 @@ import xbmc, xbmcvfs, xbmcgui
 from struct import Struct
 import urllib
 
+from StringIO import StringIO
+import gzip
+
 def log(module, msg):
     xbmc.log((u"### [%s] - %s" % (module, msg)).encode('utf-8'), level=xbmc.LOGDEBUG)
 
@@ -82,3 +85,14 @@ def extract_subtitles(archive_dir):
         if os.path.splitext(extracted_file)[1] in exts:
           extracted_subtitles.append(os.path.join(basepath, extracted_file))
     return extracted_subtitles
+
+def get_content_from_response(response):
+    content = response.read()
+    response.close()
+
+    if response.info().get('Content-Encoding') == 'gzip':
+        buf = StringIO(content)
+        f = gzip.GzipFile(fileobj=buf)
+        content = f.read()
+
+    return content

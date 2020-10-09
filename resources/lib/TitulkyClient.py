@@ -30,12 +30,12 @@ class TitulkyClient(object):
 			for header in self.extra_commands["add_headers"]: opener.addheaders += [(header['name'], header['value'])]
 		urllib2.install_opener(opener)
 
-	def download(self,sub_id):
+	def download(self,sub_id, link_file):
 
 		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), 'temp').decode("utf-8")
 		dest = os.path.join(dest_dir, "download.zip")
 
-		content = self.get_subtitle_download_page_content(sub_id)
+		content = self.get_subtitle_download_page_content(sub_id, "https://www.titulky.com/" + link_file + ".htm", None)
 		control_img = self.get_control_image(content)
 		if not control_img == None:
 			log(__name__,'Captcha required. Downloading control image.')
@@ -48,7 +48,7 @@ class TitulkyClient(object):
 			solution = ask_for_captcha(self.addon, captcha_file, self._t(32013))
 			if solution:
 				log(__name__,'Solution provided: %s' % solution)
-				content = self.get_subtitle_download_page_content(sub_id, solution)
+				content = self.get_subtitle_download_page_content(sub_id, None ,solution)
 				control_img = self.get_control_image(content)
 				if not control_img == None:
 					log(__name__,'Invalid control text')
@@ -119,7 +119,7 @@ class TitulkyClient(object):
 			return self.server_url + '/' + str(matches.group(1))
 		return None
 
-	def get_subtitle_download_page_content(self, subs_id, code = None):
+	def get_subtitle_download_page_content(self, subs_id, referer = None, code = None):
 		if code == None:
 			url = self.server_url + '/idown.php?' + urllib.urlencode({
 					'R':str(calendar.timegm(time.gmtime())),
@@ -148,9 +148,8 @@ class TitulkyClient(object):
 		if self.extra_commands.has_key('download_before'): exec(self.extra_commands["download_before"])
 
 		response = urllib2.urlopen(req)
-		content = response.read()
+		content = get_content_from_response(response)
 		log(__name__,'Opening done')
-		response.close()
 		return content
 
 	def normalize_input_title(self, title):
@@ -200,6 +199,7 @@ class TitulkyClient(object):
 			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
 			result_subtitles.append({
 				'filename': HTMLParser.HTMLParser().unescape(print_out_filename),
+				'link_file': found_subtitle['link_file'],
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
 				'rating': str(found_subtitle['down_count']*5/max_down_count) if max_down_count > 0 else "0",
@@ -251,14 +251,14 @@ class TitulkyClient(object):
 		if self.extra_commands.has_key('search_before'): exec(self.extra_commands["search_before"])
 
 		response = urllib2.urlopen(req)
-		content = response.read()
-		response.close()
+		content = get_content_from_response(response)
 
 		log(__name__,'Parsing result page')
 
 		subtitles = []
 		for row in re.finditer('<tr class=\"r(.+?)</tr>', content, re.IGNORECASE | re.DOTALL):
 			subtitle = {}
+			subtitle['link_file'] = re.search('[^<]+<td[^<]+<a href=\"(?P<data>\S+).htm\"',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
 			subtitle['id'] = re.search('[^<]+<td[^<]+<a href=\"[\w-]+-(?P<data>\d+).htm\"',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
 			subtitle['title'] = re.search('[^<]+<td[^<]+<a[^>]+>(<div[^>]+>)?(?P<data>[^<]+)',row.group(1),re.IGNORECASE | re.DOTALL ).group('data')
 			try:

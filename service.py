@@ -50,12 +50,12 @@ def Search(item):
   
   ## below arguments are optional, it can be used to pass any info needed in download function
   ## anything after "action=download&" will be sent to addon once user clicks listed subtitle to downlaod
-    url = "plugin://%s/?action=download&id=%s&lang=%s" % (__scriptid__, subtitle['id'], subtitle['lang'])
+    url = "plugin://%s/?action=download&id=%s&lang=%s&link_file=%s" % (__scriptid__, subtitle['id'], subtitle['lang'], subtitle['link_file'])
   ## add it to list, this can be done as many times as needed for all subtitles found
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False) 
 
 
-def Download(sub_id, lang):
+def Download(sub_id, lang, link_file):
   subtitle_list = []
   ## Cleanup temp dir, we recomend you download/unzip your subs in temp folder and
   ## pass that to XBMC to copy and activate
@@ -70,7 +70,7 @@ def Download(sub_id, lang):
     dialog.ok(__scriptname__,__language__(32012))
     return []
 
-  downloaded_file = cli.download(sub_id)
+  downloaded_file = cli.download(sub_id, link_file)
   if downloaded_file == None: return []
 
   log(__scriptname__,"Extracting subtitles")
@@ -152,7 +152,7 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
 
 elif params['action'] == 'download':
   ## we pickup all our arguments sent from def Search()
-  subs = Download(params["id"], params["lang"])
+  subs = Download(params["id"], params["lang"], params["link_file"])
   ## we can return more than one subtitle for multi CD versions, for now we are still working out how to handle that in XBMC core
   for sub in subs:
     listitem = xbmcgui.ListItem(label=sub)
