@@ -4,13 +4,9 @@ from utilities import log
 from uuid import getnode as uuid_node
 from hashlib import md5
 from time import sleep as sleep
-import urllib, urllib2
+import urllib
 from datetime import datetime
-
-if sys.version_info < (2, 7):
-    import simplejson
-else:
-    import json as simplejson
+import json as simplejson
 
 start_time = None
 
@@ -26,7 +22,7 @@ def mark_start_time():
 	start_time = datetime.utcnow()
 
 def send_statistics_to_server(data):
-	u = urllib2.urlopen("http://xbmc-repo-stats.bimovi.cz/save-stats", urllib.urlencode({"data" : simplejson.dumps(data)}), 10)
+	u = urllib.request.urlopen("http://xbmc-repo-stats.bimovi.cz/save-stats", urllib.parse.urlencode({"data" : simplejson.dumps(data)}).encode("utf-8"), 10)
 	log("Usage Tracking", [simplejson.dumps(data), u.getcode()])
 	return u.getcode() == 201
 
@@ -38,9 +34,9 @@ def uniq_id(mac_addr):
 		mac_addr = xbmc.getInfoLabel('Network.MacAddress')
 
 	if ":" in mac_addr:
-		return md5(str(mac_addr.decode("utf-8"))).hexdigest()
+		return md5(mac_addr.encode("utf-8")).hexdigest()
 	else:
-		return md5(str(uuid_node())).hexdigest()
+		return md5(str(uuid_node()).encode("utf-8")).hexdigest()
 
 def send_statistics(action, addon, title, item, result_count):
 
@@ -58,7 +54,7 @@ def send_statistics(action, addon, title, item, result_count):
 			info['xbmc_version'] 		= data['result']['System.BuildVersion']
 			info['os_version']           = data['result']['System.OSVersionInfo']
 
-		except Exception, e:
+		except Exception as e:
 			log("Usage Tracking", "Error JSON: %s" % e)
 			pass
 
@@ -85,6 +81,6 @@ def send_statistics(action, addon, title, item, result_count):
 			info['run_time']			= (datetime.utcnow() - start_time).total_seconds()
 
 		return send_statistics_to_server(info)
-	except Exception, e:
+	except Exception as e:
 		log("Usage Tracking", "Error: %s" % e)
 		return False

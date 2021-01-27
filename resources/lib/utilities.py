@@ -5,11 +5,11 @@ import xbmc, xbmcvfs, xbmcgui
 from struct import Struct
 import urllib
 
-from StringIO import StringIO
+from io import BytesIO
 import gzip
 
 def log(module, msg):
-    xbmc.log((u"### [%s] - %s" % (module, msg)).encode('utf-8'), level=xbmc.LOGDEBUG)
+    xbmc.log((u"### [%s] - %s" % (str(module), str(msg))), level=xbmc.LOGDEBUG)
 
 def get_file_size(filename, is_rar):
     try:
@@ -72,10 +72,12 @@ def get_file_size_from_rar(first_rar_filename):
 
 
 def extract_subtitles(archive_dir):
-    xbmc.executebuiltin(('XBMC.Extract("%s")' % archive_dir).encode('utf-8'))
+    xbmc.executebuiltin('Extract("%s")' % archive_dir)
+
     xbmc.sleep(1000)
     basepath = os.path.dirname(archive_dir)
     extracted_files = os.listdir(basepath)
+    log("Extracted content", extracted_files)
     exts = [".srt", ".sub", ".txt", ".smi", ".ssa", ".ass" ]
     extracted_subtitles = []
     if len(extracted_files) < 1 :
@@ -90,9 +92,12 @@ def get_content_from_response(response):
     content = response.read()
     response.close()
 
-    if response.info().get('Content-Encoding') == 'gzip':
-        buf = StringIO(content)
+    if response.getheader('Content-Encoding') == 'gzip':
+        buf = BytesIO(content)
         f = gzip.GzipFile(fileobj=buf)
         content = f.read()
+
+    if response.getheader('Content-Type').startswith("text/"):
+        content = content.decode("utf-8") 
 
     return content

@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from utilities import log, get_file_size, get_content_from_response
-import urllib, re, os, xbmc, xbmcgui, sys
-import urllib2, cookielib
-import HTMLParser
+import urllib, re, os, xbmc, xbmcvfs, xbmcgui, sys
+import http.cookiejar as cookielib
+from html.parser import HTMLParser
 import time,calendar
-
-if sys.version_info < (2, 7):
-    import simplejson
-else:
-    import json as simplejson
+import json as simplejson
 
 from captcha import ask_for_captcha
 from usage_stats import results_with_stats, mark_start_time
@@ -24,15 +20,15 @@ class TitulkyClient(object):
 		mark_start_time()
 		self.load_extra_commands()
 
-		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
+		opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookielib.LWPCookieJar()))
 		opener.addheaders = []
-		if self.extra_commands.has_key("add_headers"):
+		if "add_headers" in self.extra_commands:
 			for header in self.extra_commands["add_headers"]: opener.addheaders += [(header['name'], header['value'])]
-		urllib2.install_opener(opener)
+		urllib.request.install_opener(opener)
 
 	def download(self,sub_id, link_file):
 
-		dest_dir = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), 'temp').decode("utf-8")
+		dest_dir = os.path.join(xbmcvfs.translatePath(self.addon.getAddonInfo('profile')), 'temp')
 		dest = os.path.join(dest_dir, "download.zip")
 
 		content = self.get_subtitle_download_page_content(sub_id, "https://www.titulky.com/" + link_file + ".htm", None)
@@ -52,10 +48,10 @@ class TitulkyClient(object):
 				control_img = self.get_control_image(content)
 				if not control_img == None:
 					log(__name__,'Invalid control text')
-					xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
+					xbmc.executebuiltin(("Notification(%s,%s,1000,%s)" % (
 						self.addon.getAddonInfo('name'), self._t(32014),
-						os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')),'icon.png').decode("utf-8")
-					)).encode("utf-8"))
+						os.path.join(xbmcvfs.translatePath(self.addon.getAddonInfo('path')),'icon.png')
+					)))
 					return None
 				log(__name__,'Control image OK')
 			else:
@@ -67,11 +63,11 @@ class TitulkyClient(object):
 		link = self.get_final_download_link(content)
 		log(__name__,'Got the link, wait %i seconds before download' % (wait_time))
 		for i in range(wait_time + 1):
-			xbmc.executebuiltin(("XBMC.Notification(%s,%s,1000,%s)" % (
+			xbmc.executebuiltin(("Notification(%s,%s,1000,%s)" % (
 				self.addon.getAddonInfo('name'),
 				self._t(32015) % (wait_time - i),
-				os.path.join(xbmc.translatePath(self.addon.getAddonInfo('path')),'icon.png').decode("utf-8")
-			)).encode("utf-8"))
+				os.path.join(xbmcvfs.translatePath(self.addon.getAddonInfo('path')),'icon.png')
+			)))
 			time.sleep(1)
 
 		log(__name__,'Downloading subtitle zip from %s' % link)
@@ -87,22 +83,22 @@ class TitulkyClient(object):
 		return dest
 
 	def get_file(self,link, referer = None):
-		req = urllib2.Request(link)
+		req = urllib.request.Request(link)
 		req = self.add_cookies_into_header(req)
 		if not referer == None:
 			req.add_header('Referer', referer)
 
-		if self.extra_commands.has_key('get_file_before'): exec(self.extra_commands["get_file_before"])
+		if 'get_file_before' in self.extra_commands: exec(self.extra_commands["get_file_before"])
 
-		response = urllib2.urlopen(req)
+		response = urllib.request.urlopen(req)
 
-		if response.headers.get('Set-Cookie'):
-			phpsessid = re.search('PHPSESSID=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL)
+		if response.getheader('Set-Cookie'):
+			phpsessid = re.search('PHPSESSID=(\S+);', response.getheader('Set-Cookie'), re.IGNORECASE | re.DOTALL)
 			if phpsessid: self.cookies['PHPSESSID'] = phpsessid.group(1)
 
 		data = get_content_from_response(response)
 
-		if self.extra_commands.has_key('get_file_after'): exec(self.extra_commands["get_file_after"])
+		if 'get_file_after' in self.extra_commands: exec(self.extra_commands["get_file_after"])
 
 		return data
 
@@ -121,13 +117,13 @@ class TitulkyClient(object):
 
 	def get_subtitle_download_page_content(self, subs_id, referer = None, code = None):
 		if code == None:
-			url = self.server_url + '/idown.php?' + urllib.urlencode({
+			url = self.server_url + '/idown.php?' + urllib.parse.urlencode({
 					'R':str(calendar.timegm(time.gmtime())),
 					'titulky':subs_id,
 					'histstamp':'',
 					'zip':'z'})
 			log(__name__,'Opening %s' % (url))
-			req = urllib2.Request(url)
+			req = urllib.request.Request(url)
 
 		else:
 			url = self.server_url+'/idown.php'
@@ -139,15 +135,15 @@ class TitulkyClient(object):
 				'histstamp':''
 			}
 			log(__name__,'Opening %s POST:%s' % (url,str(post_data)))
-			req = urllib2.Request(url,urllib.urlencode(post_data))
+			req = urllib.request.Request(url,urllib.parse.urlencode(post_data).encode("utf-8"))
 
 		req = self.add_cookies_into_header(req)
 		if not referer == None:
 			req.add_header('Referer', referer )
 
-		if self.extra_commands.has_key('download_before'): exec(self.extra_commands["download_before"])
+		if 'download_before' in self.extra_commands: exec(self.extra_commands["download_before"])
 
-		response = urllib2.urlopen(req)
+		response = urllib.request.urlopen(req)
 		content = get_content_from_response(response)
 		log(__name__,'Opening done')
 		return content
@@ -198,11 +194,11 @@ class TitulkyClient(object):
 			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '' or found_subtitle['version'] == None]
 			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
 			result_subtitles.append({
-				'filename': HTMLParser.HTMLParser().unescape(print_out_filename),
+				'filename': HTMLParser().unescape(print_out_filename),
 				'link_file': found_subtitle['link_file'],
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
-				'rating': str(found_subtitle['down_count']*5/max_down_count) if max_down_count > 0 else "0",
+				'rating': int(found_subtitle['down_count']*5/max_down_count) if max_down_count > 0 else 0,
 				'sync': (found_subtitle['size'] == file_size and file_size > 0),
 				'lang_flag': xbmc.convertLanguage(found_subtitle['lang'],xbmc.ISO_639_1),
 			})
@@ -243,14 +239,14 @@ class TitulkyClient(object):
 
 
 	def search_subtitle(self, title):
-		url = self.server_url + '/index.php?' + urllib.urlencode({'Fulltext': title ,'FindUser':''})
+		url = self.server_url + '/index.php?' + urllib.parse.urlencode({'Fulltext': title ,'FindUser':''})
 		log(__name__, "Opening: %s" % url)
 
-		req = urllib2.Request(url)
+		req = urllib.request.Request(url)
 
-		if self.extra_commands.has_key('search_before'): exec(self.extra_commands["search_before"])
+		if 'search_before' in self.extra_commands: exec(self.extra_commands["search_before"])
 
-		response = urllib2.urlopen(req)
+		response = urllib.request.urlopen(req)
 		content = get_content_from_response(response)
 
 		log(__name__,'Parsing result page')
@@ -286,38 +282,38 @@ class TitulkyClient(object):
 			except:
 				subtitle['author'] = None
 
-			if self.extra_commands.has_key('search_parse'): exec(self.extra_commands["search_parse"])
+			if 'search_parse' in self.extra_commands: exec(self.extra_commands["search_parse"])
 
 			subtitles.append(subtitle)
 
-		if self.extra_commands.has_key('search_after'): exec(self.extra_commands["search_after"])
+		if 'search_after' in self.extra_commands: exec(self.extra_commands["search_after"])
 
 		return subtitles
 
 	def login(self,username,password):
 		log(__name__,'Logging in to Titulky.com')
 		if not username: return False
-		login_postdata = urllib.urlencode({'Login': username, 'Password': password, 'foreverlog': '0','Detail2':''} )
-		request = urllib2.Request(self.server_url + '/index.php',login_postdata)
+		login_postdata = urllib.parse.urlencode({'Login': username, 'Password': password, 'foreverlog': '0','Detail2':''} ).encode("utf-8")
+		request = urllib.request.Request(self.server_url + '/index.php',login_postdata)
 		request.add_header('Origin',  self.server_url)
 
-		if self.extra_commands.has_key('login_before'):
+		if 'login_before' in self.extra_commands:
 			do_return = None
 			exec(self.extra_commands["login_before"])
 			if do_return != None: return do_return
 
-		response = urllib2.urlopen(request)
+		response = urllib.request.urlopen(request)
 		content = get_content_from_response(response)
 
 		if content.find('BadLogin')>-1: return False
 
 		log(__name__,'Storing Cookies')
 		self.cookies = {}
-		self.cookies['CRC'] = re.search('CRC=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
-		self.cookies['LogonLogin'] = re.search('LogonLogin=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
-		self.cookies['LogonId'] = re.search('LogonId=(\S+);', response.headers.get('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
+		self.cookies['CRC'] = re.search('CRC=(\S+);', response.getheader('Set-Cookie'), re.IGNORECASE | re.DOTALL | re.MULTILINE).group(1)
+		self.cookies['LogonLogin'] = re.search('LogonLogin=(\S+);', response.getheader('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
+		self.cookies['LogonId'] = re.search('LogonId=(\S+);', response.getheader('Set-Cookie'), re.IGNORECASE | re.DOTALL).group(1)
 
-		if self.extra_commands.has_key('login_after'):
+		if 'login_after' in self.extra_commands:
 			do_return = None
 			exec(self.extra_commands["login_after"])
 			if do_return != None: return do_return
@@ -336,7 +332,7 @@ class TitulkyClient(object):
 		cookies_string = ""
 		for cookie in self.cookies: cookies_string += "%s=%s; " % (cookie, self.cookies[cookie])
 
-		if self.extra_commands.has_key("add_cookies"):
+		if "add_cookies" in self.extra_commands:
 			for cookie in self.extra_commands["add_cookies"]: cookies_string +=  "%s=%s; " % (cookie, self.extra_commands["add_cookies"][cookie])
 
 		request.add_header('Cookie',cookies_string)
@@ -345,7 +341,7 @@ class TitulkyClient(object):
 
 	def load_extra_commands(self):
 		self.extra_commands = {}
-		extra_commands_file = xbmc.translatePath( os.path.join(self.addon.getAddonInfo('profile'), 'extra_commands.json') ).decode("utf-8")
+		extra_commands_file = xbmcvfs.translatePath( os.path.join(self.addon.getAddonInfo('profile'), 'extra_commands.json'))
 		if os.path.exists(extra_commands_file):
 			ext_file = open(extra_commands_file, "r")
 			self.extra_commands = simplejson.loads(ext_file.read())
