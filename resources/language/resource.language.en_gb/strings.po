@@ -1,0 +1,63 @@
+msgid ""
+msgstr ""
+
+msgctxt "#32012"
+msgid "Login to Titulky.com failed. Check your username/password at the addon configuration"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Enter code from image"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Invalid control text"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Download will start in %i seconds"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Addon is only for Czech and Slovak subtitles. Check the settings of the language for which you want to download subtitles."
+msgstr ""
+
+msgctxt "#32101"
+msgid "Open settings?"
+msgstr ""
+
+msgctxt "#32910"
+msgid "Searching"
+msgstr ""
+
+msgctxt "#32911"
+msgid "Use text in brackets as search pattern and normalize"
+msgstr ""
+
+msgctxt "#32914"
+msgid "Clean title search prior to the excess text (brackets, formatting, etc.)."
+msgstr ""
+
+msgctxt "#32920"
+msgid "Account"
+msgstr ""
+
+msgctxt "#32921"
+msgid "Username"
+msgstr ""
+
+msgctxt "#32922"
+msgid "Password"
+msgstr ""
+
+msgctxt "#32930"
+msgid "Statistics"
+msgstr ""
+
+msgctxt "#32931"
+msgid "Send anonymous usage statistics"
+msgstr ""
+
+msgctxt "#32940"
+msgid "Download subtitle is only possible with a premium or translator account on Titulky.com"
+msgstr ""
+

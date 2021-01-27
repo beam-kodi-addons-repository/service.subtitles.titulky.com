@@ -1,0 +1,63 @@
+msgid ""
+msgstr ""
+
+msgctxt "#32012"
+msgid "Login to Titulky.com failed. Check your username/password at the addon configuration"
+msgstr "Přihlášení se nezdařilo. Zkontrolujte jméno a heslo v nastavení doplňku."
+
+msgctxt "#32013"
+msgid "Enter code from image"
+msgstr "Zadejte text z kontrolního obrázku"
+
+msgctxt "#32014"
+msgid "Invalid control text"
+msgstr "Špatně opsaný kontrolní obrázek"
+
+msgctxt "#32015"
+msgid "Download will start in %i seconds"
+msgstr "Stahování začne za %i sekund"
+
+msgctxt "#32100"
+msgid "Addon is only for Czech and Slovak subtitles. Check the settings of the language for which you want to download subtitles."
+msgstr "Doplněk je určen pro české a slovenské titulky, zkontrolujte Vaše nastavení jazyků, pro které chcete titulky stahovat."
+
+msgctxt "#32101"
+msgid "Open settings?"
+msgstr "Otevřít nastavení?"
+
+msgctxt "#32910"
+msgid "Searching"
+msgstr "Vyhledávání"
+
+msgctxt "#32911"
+msgid "Use text in brackets as search pattern and normalize"
+msgstr "Použít text v závorce ve jméně jako základ pro vyhledávaní"
+
+msgctxt "#32914"
+msgid "Clean title search prior to the excess text (brackets, formatting, etc.)."
+msgstr "Vyčistit název před vyhledáváním o přebytečný text (závorky, formátování, atd..)"
+
+msgctxt "#32920"
+msgid "Account"
+msgstr "Účet"
+
+msgctxt "#32921"
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+msgctxt "#32922"
+msgid "Password"
+msgstr "Heslo"
+
+msgctxt "#32930"
+msgid "Statistics"
+msgstr "Statistiky"
+
+msgctxt "#32931"
+msgid "Send anonymous usage statistics"
+msgstr "Odesílat anonymní statistiky o využití doplňku"
+
+msgctxt "#32940"
+msgid "Download subtitle is only possible with a premium or translator account on Titulky.com"
+msgstr "Stažení titulků je možné pouze s premium nebo překladatelským účtem na Titulky.com"
+
