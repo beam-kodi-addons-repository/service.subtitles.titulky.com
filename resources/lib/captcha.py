@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import xbmcgui, xbmc
+import xbmcgui, xbmc, xbmcvfs, os
 
 class CaptchaWindow( xbmcgui.WindowXMLDialog ):
 
@@ -23,5 +23,10 @@ class CaptchaWindow( xbmcgui.WindowXMLDialog ):
         return False
 
 def ask_for_captcha(addon, img, title):
-    solver = CaptchaWindow('captcha-image.xml',addon.getAddonInfo('path'),'default','720p', captcha = img, title_text = title)
+    current_skin_name = xbmc.getSkinDir()
+    if xbmcvfs.exists(xbmcvfs.translatePath(os.path.join(addon.getAddonInfo('path'), 'resources', 'skins', current_skin_name, '720p', 'captcha-image.xml'))):
+        default_skin_name = current_skin_name
+    else:
+        default_skin_name = "default"
+    solver = CaptchaWindow('captcha-image.xml',addon.getAddonInfo('path'),default_skin_name,'720p', captcha = img, title_text = title)
     return solver.get()
