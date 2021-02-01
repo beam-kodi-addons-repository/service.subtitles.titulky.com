@@ -23,9 +23,9 @@ jobs:
       - name: Create package
         run: repository-managment/create-package.rb -r source-code -t $GITHUB_REF
       - name: Set environment variable with release filename
-        run: echo "::set-env name=RELEASE_FILENAME::$(cat RELEASE_NAME)"
+        run: echo "RELEASE_FILENAME=$(cat RELEASE_NAME)" >> $GITHUB_ENV
       - name: set environment variable with GH release ID
-        run: echo "::set-env name=RELEASE_ID::$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)"
+        run: echo "RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
       - name: Upload release zip to Github Releases
         uses: actions/upload-release-asset@v1
         env:
