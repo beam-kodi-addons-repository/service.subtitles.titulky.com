@@ -2,7 +2,7 @@
 
 import os
 import sys
-import urllib
+import urllib, urllib.parse, urllib.request
 import xbmc, xbmcvfs, xbmcaddon, xbmcgui, xbmcplugin
 import shutil
 import unicodedata

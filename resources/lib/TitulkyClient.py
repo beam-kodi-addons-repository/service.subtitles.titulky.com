@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from utilities import log, get_file_size, get_content_from_response
-import urllib, re, os, xbmc, xbmcvfs, xbmcgui, sys
+import urllib, urllib.parse, urllib.request
+import re, os, xbmc, xbmcvfs, xbmcgui, sys
 import http.cookiejar as cookielib
 from html.parser import HTMLParser
 import time,calendar

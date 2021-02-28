@@ -4,7 +4,7 @@ from utilities import log
 from uuid import getnode as uuid_node
 from hashlib import md5
 from time import sleep as sleep
-import urllib
+import urllib, urllib.parse, urllib.request
 from datetime import datetime
 import json as simplejson
 

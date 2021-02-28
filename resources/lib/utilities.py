@@ -3,7 +3,6 @@
 import os
 import xbmc, xbmcvfs, xbmcgui
 from struct import Struct
-import urllib
 
 from io import BytesIO
 import gzip
