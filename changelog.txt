@@ -1,3 +1,6 @@
+v1.6.2 (29.3.2021)
+- rozdeleni repositare a novy deployment
+
 v1.6.1 (9.10.2020)
 - zapomnel jsem jeden commit
 

@@ -30,10 +30,6 @@ from TitulkyClient import TitulkyClient as SubtitlesClient
 
 def Search(item):
 
-  #### Do whats needed to get the list of subtitles from service site
-  #### use item["some_property"] that was set earlier
-  #### once done, set xbmcgui.ListItem() below and pass it to xbmcplugin.addDirectoryItem()
-
   cli = SubtitlesClient(__addon__)
   found_subtitles = cli.search(item)
 
@@ -48,17 +44,12 @@ def Search(item):
     listitem.setProperty( "sync", ("false", "true")[int(subtitle['sync'])])  # set to "true" if subtitle is matched by hash,
     listitem.setProperty( "hearing_imp", "false" ) # set to "true" if subtitle is for hearing impared
   
-  ## below arguments are optional, it can be used to pass any info needed in download function
-  ## anything after "action=download&" will be sent to addon once user clicks listed subtitle to downlaod
     url = "plugin://%s/?action=download&id=%s&lang=%s&link_file=%s" % (__scriptid__, subtitle['id'], subtitle['lang'], subtitle['link_file'])
-  ## add it to list, this can be done as many times as needed for all subtitles found
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=url,listitem=listitem,isFolder=False) 
 
 
 def Download(sub_id, lang, link_file):
   subtitle_list = []
-  ## Cleanup temp dir, we recomend you download/unzip your subs in temp folder and
-  ## pass that to XBMC to copy and activate
   if xbmcvfs.exists(__temp__):
     shutil.rmtree(__temp__)
   xbmcvfs.mkdirs(__temp__)
@@ -76,7 +67,6 @@ def Download(sub_id, lang, link_file):
   log(__scriptname__,"Extracting subtitles")
   subtitle_list = extract_subtitles(downloaded_file)
   log(__scriptname__,subtitle_list)
-  # subtitle_list.append("/Path/Of/Subtitle2.srt") # this can be url, local path or network path.
   
   return subtitle_list
  
@@ -153,7 +143,6 @@ if params['action'] == 'search' or params['action'] == 'manualsearch':
 elif params['action'] == 'download':
   ## we pickup all our arguments sent from def Search()
   subs = Download(params["id"], params["lang"], params["link_file"])
-  ## we can return more than one subtitle for multi CD versions, for now we are still working out how to handle that in XBMC core
   for sub in subs:
     listitem = xbmcgui.ListItem(label=sub)
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=sub,listitem=listitem,isFolder=False)
