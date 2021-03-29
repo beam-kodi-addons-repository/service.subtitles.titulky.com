@@ -27,7 +27,7 @@ jobs:
       - name: set environment variable with GH release ID
         run: echo "RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
       - name: set environment variable with Kodi version
-        run: echo "KODI_VERSION=$(cat .kodi-version)" >> $GITHUB_ENV
+        run: echo "KODI_VERSION=$(cat source-code/.kodi-version)" >> $GITHUB_ENV
       - name: Upload release zip to Github Releases
         uses: actions/upload-release-asset@v1
         env:
