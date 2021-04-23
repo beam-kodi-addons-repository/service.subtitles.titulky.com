@@ -4,7 +4,7 @@ from utilities import log, get_file_size, get_content_from_response
 import urllib, urllib.parse, urllib.request
 import re, os, xbmc, xbmcvfs, xbmcgui, sys
 import http.cookiejar as cookielib
-from html.parser import HTMLParser
+import html
 import time,calendar
 import json as simplejson
 
@@ -195,7 +195,7 @@ class TitulkyClient(object):
 			print_out_filename = (found_subtitle['version'], found_subtitle['title'])[found_subtitle['version'] == '' or found_subtitle['version'] == None]
 			if not found_subtitle['author'] == None: print_out_filename += " by " + found_subtitle['author']
 			result_subtitles.append({
-				'filename': HTMLParser().unescape(print_out_filename),
+				'filename': html.unescape(print_out_filename),
 				'link_file': found_subtitle['link_file'],
 				'id': found_subtitle['id'],
 				'lang': found_subtitle['lang'],
