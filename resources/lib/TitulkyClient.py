@@ -74,7 +74,7 @@ class TitulkyClient(object):
 		log(__name__,'Downloading subtitle zip from %s' % link)
 
 		# DOWNLOAD FILE
-		subtitles_data = self.get_file(link, "https://www.titulky.com/idown.php")
+		subtitles_data = self.get_file(link, "https://www.titulky.com/idown.php", 'gzip, deflate, br')
 
 		log(__name__,'Saving to file %s' % dest)
 		zip_file = open(dest,'wb')
@@ -83,11 +83,14 @@ class TitulkyClient(object):
 
 		return dest
 
-	def get_file(self,link, referer = None):
+	def get_file(self,link, referer = None, encoding = None):
 		req = urllib.request.Request(link)
 		req = self.add_cookies_into_header(req)
-		if not referer == None:
+		if referer:
 			req.add_header('Referer', referer)
+
+		if encoding:
+			req.add_header('Accept-Encoding', encoding)
 
 		if 'get_file_before' in self.extra_commands: exec(self.extra_commands["get_file_before"])
 
@@ -322,8 +325,6 @@ class TitulkyClient(object):
 		content = self.get_file(self.server_url + "/?Registration=Edit")
 		if content.find("<a id=\"userNickName\" title=\"TOP ") == -1:
 			log(__name__, "Normalni uzivatel")
-			dialog = xbmcgui.Dialog()
-			dialog.ok(self.addon.getAddonInfo('name'),self.addon.getLocalizedString(32940))
 		else:
 			log(__name__,"Premium uzivatel")
 
